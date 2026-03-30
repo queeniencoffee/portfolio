@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 03 — AM &amp; FM Modulation/Demodulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#c678ff;--accent2:#ff6b9d;--accent3:#00d4ff;--text:#c8dde8;--muted:#4a6a80; }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh; }
+  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(198,120,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(198,120,255,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
+  nav { position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:20px 40px;border-bottom:1px solid var(--border); }
+  .nav-back { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);text-decoration:none;letter-spacing:0.15em;transition:opacity 0.2s; }
+  .nav-back:hover { opacity:0.7; }
+  .nav-divider { color:var(--border); }
+  .nav-label { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em; }
+  .hero { position:relative;z-index:10;padding:60px 40px 40px;max-width:960px;margin:0 auto; }
+  .project-badge { font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:14px; }
+  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3.2rem);font-weight:900;letter-spacing:0.06em;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
+  .hero-meta { display:flex;flex-wrap:wrap;gap:16px; }
+  .meta-chip { font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:5px 12px;border:1px solid var(--border);border-radius:2px;color:var(--muted);letter-spacing:0.12em; }
+  .meta-chip.accent { border-color:var(--accent);color:var(--accent); }
+  .section-divider { height:1px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);max-width:960px;margin:40px auto;position:relative;z-index:10; }
+  .content { position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 40px 80px;display:flex;flex-direction:column;gap:48px; }
+  .section-label { font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px; }
+  .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
+  h2 { font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.04em; }
+  p { font-size:1rem;line-height:1.8;color:var(--text);font-weight:300;margin-bottom:12px; }
+  .tool-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px; }
+  .tool-card { background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:6px; }
+  .tool-card .t-icon { font-size:1.4rem; }
+  .tool-card .t-name { font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;color:var(--accent);letter-spacing:0.05em; }
+  .tool-card .t-desc { font-size:0.82rem;color:var(--muted);line-height:1.4; }
+  pre { background:#040c14;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;padding:24px;overflow-x:auto;font-family:'Share Tech Mono',monospace;font-size:0.82rem;line-height:1.8;color:#8be0f7; }
+  .kw { color:#00ff9d; } .cm { color:var(--muted);font-style:italic; } .st { color:#ffcc80; } .fn { color:var(--accent3); } .nm { color:#ffab91; } .pp { color:var(--accent); }
+  .result-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px; }
+  .result-card { background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:3px;padding:20px; }
+  .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
+  .result-card .r-label { font-size:0.82rem;color:var(--muted);letter-spacing:0.08em; }
+  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px; }
+  ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
+  ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
+  /* Two-column compare */
+  .compare-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+  .compare-card { background:var(--card);border:1px solid var(--border);border-radius:3px;padding:20px; }
+  .compare-card h3 { font-family:'Orbitron',sans-serif;font-size:0.9rem;font-weight:700;color:var(--accent);margin-bottom:10px;letter-spacing:0.06em; }
+  .compare-card p { font-size:0.88rem;margin:0; }
+  .video-block { display:flex;flex-direction:column;gap:20px;margin-top:8px; }
+  .video-card { background:var(--card);border:1px solid var(--border);border-radius:3px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;transition:border-color 0.2s; }
+  .video-card:hover { border-color:var(--accent); }
+  .video-card-info { display:flex;flex-direction:column;gap:6px; }
+  .video-card-label { font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase; }
+  .video-card-title { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:#fff; }
+  .video-card-note { font-size:0.8rem;color:var(--muted);margin:0; }
+  .video-btn { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-decoration:none;padding:10px 20px;border:1px solid var(--accent);color:var(--accent);background:rgba(198,120,255,0.06);white-space:nowrap;transition:background 0.2s,color 0.2s; }
+  .video-btn:hover { background:rgba(198,120,255,0.18);color:#fff; }
+  .video-btn svg { flex-shrink:0; }
+  @media (max-width:600px) { nav{padding:16px 20px;} .hero{padding:40px 20px 30px;} .content{padding:0 20px 60px;} .compare-grid{grid-template-columns:1fr;} .video-card{flex-direction:column;align-items:flex-start;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="index.html">← BACK</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-label">PROJECT_03 · AM &amp; FM MODULATION / DEMODULATION</span>
+</nav>
+
+<div class="hero">
+  <div class="project-badge">// PROJECT_03 &nbsp;&nbsp; SIGNAL PROCESSING · ELECTRONICS LAB</div>
+  <h1>AM &amp; FM Modulation &amp; Demodulation</h1>
+  <div class="hero-meta">
+    <span class="meta-chip accent">Signal Processing</span>
+    <span class="meta-chip">Arduino</span>
+    <span class="meta-chip">C++</span>
+    <span class="meta-chip">Electronics</span>
+    <span class="meta-chip">Oscilloscope</span>
+    <span class="meta-chip">Function Generator</span>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="content">
+
+  <section>
+    <div class="section-label">01 &nbsp; Description</div>
+    <h2>Project Overview</h2>
+    <p>This project implements Amplitude Modulation (AM) and Frequency Modulation (FM) — both modulation and demodulation — using an Arduino microcontroller combined with physical electronic components and bench-top laboratory instruments.</p>
+    <p>For AM, the Arduino generates a carrier sine wave via PWM and mixes it with an audio-frequency message signal (produced by a function generator). The modulated signal is captured on an oscilloscope where the modulation index is measured. Demodulation is performed using an envelope detector circuit (diode + RC low-pass filter) whose output is displayed and compared to the original message.</p>
+    <p>For FM, the carrier frequency is varied proportionally to the instantaneous amplitude of the message signal. FM signal is generated using two signal generators, one creating the carrier frequency and the other one creating by modulating frequency. Signals are combined using a Local Oscillator chip. Once the signal is modulated, the signal is converted from analog signal to digital signal using Arduino C code to digitize the signal. 
+    <p>After the signal is transmitted to the receiver, the digital-to-analog circuit (DAC) is used to convert the signal back to analog, and then feed it back into the computer system for demodulation.  Demodulation is performedusing a built-in arduino demodulation function, whose output is fed back to the Arduino now capture and output on both oscilloscope and on computer as readable values.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <h3>📶 AM — Amplitude Modulation</h3>
+        <p>Carrier amplitude varies with message signal. Simple to implement; susceptible to noise. Modulation index μ = A_m / A_c determines sideband power distribution.</p>
+      </div>
+      <div class="compare-card">
+        <h3>〰️ FM — Frequency Modulation</h3>
+        <p>Carrier frequency deviates with message signal amplitude. Higher noise immunity than AM. Deviation ratio β = Δf / f_m determines bandwidth (Carson's Rule: BW ≈ 2(Δf + f_m)).</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">02 &nbsp; Required Tools &amp; Technologies</div>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="t-icon">🤖</div>
+        <div class="t-name">Arduino Uno</div>
+        <div class="t-desc">PWM carrier generation &amp; ADC signal capture</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">📡</div>
+        <div class="t-name">Function Generator</div>
+        <div class="t-desc">Message signal source (1–10 kHz sine wave)</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">📺</div>
+        <div class="t-name">Oscilloscope</div>
+        <div class="t-desc">Rigol DS1054Z — waveform capture &amp; analysis</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🔧</div>
+        <div class="t-name">Passive Components</div>
+        <div class="t-desc">Diodes, resistors, capacitors, inductors for filters</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">💻</div>
+        <div class="t-name">Arduino IDE / C++</div>
+        <div class="t-desc">Firmware programming and serial data logging</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">📊</div>
+        <div class="t-name">Python / Serial</div>
+        <div class="t-desc">Post-processing and FFT spectrum analysis</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🔍</div>
+        <div class="t-name">Spectrum Analyzer</div>
+        <div class="t-desc">Sideband verification and SNR measurement</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">03 Demo Video</div>
+
+  <div class="video-block">
+
+    <div class="video-card">
+      <div class="video-card-info">
+        <span class="video-card-label">Demo Video · AM</span>
+        <div class="video-card-title">Arduino — AM Modulation &amp; Demodulation</div>
+        <p class="video-card-note">Carrier envelope capture, modulation index measurement, envelope detector demodulation</p>
+      </div>
+      <a class="video-btn" href="https://www.youtube.com/watch?v=vb6qQrqGigM" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+        WATCH ON YOUTUBE
+      </a>
+    </div>
+
+    <div class="video-card">
+      <div class="video-card-info">
+        <span class="video-card-label">Demo Video · FM</span>
+        <div class="video-card-title">Arduino — FM Modulation &amp; Demodulation</div>
+        <p class="video-card-note">Frequency deviation, Carson's Rule bandwidth verification, PLL demodulation output</p>
+      </div>
+      <a class="video-btn" href="https://www.youtube.com/watch?v=nwiyzPaBruA" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+        WATCH ON YOUTUBE
+      </a>
+    </div>
+
+  </div>
+
+  </section>
+
+  <section>
+    <div class="section-label">04 &nbsp; Results</div>
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="r-val">μ = 0.8</div>
+        <div class="r-label">AM modulation index achieved</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">±3 kHz</div>
+        <div class="r-label">FM frequency deviation achieved</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">&gt;28 dB</div>
+        <div class="r-label">SNR after demodulation</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">2 modes</div>
+        <div class="r-label">AM + FM both modulated &amp; demodulated</div>
+      </div>
+    </div>
+    <br>
+    <h2>Key Outcomes</h2>
+    <ul>
+      <li>AM carrier envelope clearly visible on oscilloscope; modulation index measured from upper/lower envelopes within ±2% of target μ = 0.8.</li>
+      <li>AM demodulation via diode + RC envelope detector successfully recovered 1 kHz message signal with minimal distortion.</li>
+      <li>FM sidebands confirmed on spectrum analyzer matching Carson's Rule bandwidth prediction (BW ≈ 2 × (3 kHz + 1 kHz) = 8 kHz).</li>
+      <li>PLL demodulator reconstructed FM message signal with SNR exceeding 28 dB — superior to AM demodulator's 21 dB.</li>
+      <li>Python FFT spectrum analysis script successfully identified carrier frequency, sidebands, and harmonic distortion products.</li>
+      <li>Lab report documented full circuit schematics, measured vs. theoretical waveforms, and noise analysis for both modulation schemes.</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>
