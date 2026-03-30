@@ -589,6 +589,71 @@
     line-height: 1.6;
   }
 
+  /* DEMO BOX */
+  .demo-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .demo-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .demo-box-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .demo-box-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.06em;
+  }
+  .demo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: 2px;
+    padding: 14px 32px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 24px rgba(0,212,255,0.25);
+  }
+  .demo-btn:hover {
+    background: #33ddff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 36px rgba(0,212,255,0.45);
+  }
+  .demo-btn svg {
+    width: 14px; height: 14px;
+    fill: var(--bg);
+    flex-shrink: 0;
+  }
+
   /* FOOTER */
   .page-footer {
     position: relative; z-index: 10;
@@ -673,6 +738,21 @@
 <div class="section-divider"></div>
 
 <div class="content">
+
+  <!-- 00 DEMO LINK -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">00</span> Link to Demo</div>
+    <div class="demo-box">
+      <div class="demo-box-label">Live Project</div>
+      <div class="demo-box-title">3D Satellite Viewer — Interactive Demo</div>
+      <a class="demo-btn" href="Project1_satellite-viewer-3d.html" target="_blank">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v3.19l2.03 2.03-1.06 1.06-2.22-2.22A.75.75 0 0 1 7.25 8V4.5h1.5z"/>
+        </svg>
+        Click Here to Launch
+      </a>
+    </div>
+  </section>
 
   <!-- 01 OVERVIEW -->
   <section class="reveal">
