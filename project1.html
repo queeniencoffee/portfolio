@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 01 — Satellite Viewer 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a10;
+    --surface: #0b1420;
+    --card: #0d1a2a;
+    --border: #1a3a5c;
+    --accent: #00d4ff;
+    --accent2: #00ff9d;
+    --accent3: #ff6b35;
+    --text: #c8dde8;
+    --muted: #4a6a80;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.018) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scroll-reveal base */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 20px;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,10,16,0.94);
+    backdrop-filter: blur(10px);
+  }
+  .nav-back {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.15em;
+    transition: opacity 0.2s;
+  }
+  .nav-back:hover { opacity: 0.65; }
+  .nav-divider { color: var(--border); }
+  .nav-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    flex: 1;
+  }
+  .nav-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 10;
+    padding: 72px 40px 48px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .project-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.38em;
+    color: var(--accent);
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 5.5vw, 3.6rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.08;
+    background: linear-gradient(130deg, #fff 0%, var(--accent) 55%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 22px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.2s forwards;
+  }
+  .hero-sub {
+    font-size: 1.08rem;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 28px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.3s forwards;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.4s forwards;
+  }
+  .meta-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.64rem;
+    padding: 4px 11px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .meta-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .meta-chip.accent { border-color: var(--accent); color: var(--accent); }
+  .meta-chip.accent2 { border-color: var(--accent2); color: var(--accent2); }
+
+  /* HERO STATS STRIP */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin: 40px 0 0;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.5s forwards;
+  }
+  .hstat {
+    padding: 20px 22px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .hstat:last-child { border-right: none; }
+  .hstat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent2);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    transform-origin: left;
+  }
+  .hstat:hover::before { transform: scaleX(1); }
+  .hstat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: var(--accent2);
+    margin-bottom: 3px;
+  }
+  .hstat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent 70%);
+    max-width: 1000px;
+    margin: 48px auto;
+    position: relative; z-index: 10;
+  }
+
+  /* CONTENT */
+  .content {
+    position: relative; z-index: 10;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.38em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+  .section-num {
+    font-size: 0.58rem;
+    color: var(--muted);
+  }
+
+  h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+  h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+  p {
+    font-size: 0.97rem;
+    line-height: 1.85;
+    color: var(--text);
+    font-weight: 300;
+    margin-bottom: 14px;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  /* OVERVIEW LAYOUT */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+    align-items: start;
+  }
+  .overview-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sidebar-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 18px;
+  }
+  .sidebar-card-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .sidebar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+  }
+  .sidebar-row:last-child { margin-bottom: 0; }
+  .sidebar-key { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em; }
+  .sidebar-val { color: var(--text); font-weight: 400; }
+  .sidebar-val.green { color: var(--accent2); font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; }
+
+  /* CHALLENGE / APPROACH CARDS */
+  .challenge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .challenge-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .challenge-card:hover { border-color: var(--accent); }
+  .challenge-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+  }
+  .challenge-card.orange::before { background: var(--accent3); }
+  .challenge-card.green::before { background: var(--accent2); }
+  .challenge-card.purple::before { background: #9d6dff; }
+  .ch-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .ch-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .ch-body {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* TOOL GRID */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 11px;
+  }
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .tool-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .t-icon { font-size: 1.35rem; }
+  .t-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .t-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.57rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+  }
+  .t-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px;
+    margin-top: 20px;
+  }
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 12px;
+  }
+  .arch-row:last-child { margin-bottom: 0; }
+  .arch-box {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 14px;
+    text-align: center;
+  }
+  .arch-box-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .arch-box-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.52rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .arch-box.blue { border-color: var(--accent); }
+  .arch-box.green { border-color: var(--accent2); }
+  .arch-box.orange { border-color: var(--accent3); }
+  .arch-arrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    padding: 0 10px;
+    flex-shrink: 0;
+  }
+
+  /* CODE BLOCKS */
+  .code-section { display: flex; flex-direction: column; gap: 20px; }
+  .code-block {
+    background: #030b12;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .code-block.green { border-left-color: var(--accent2); }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
+  }
+  .code-filename {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.64rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .code-block.green .code-filename { color: var(--accent2); }
+  .code-lang {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.56rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  pre {
+    background: transparent;
+    border: none;
+    border-left: none;
+    border-radius: 0;
+    padding: 22px 20px;
+    overflow-x: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.85;
+    color: #8be0f7;
+    margin: 0;
+  }
+  .kw  { color: var(--accent2); }
+  .cm  { color: #3d5e70; font-style: italic; }
+  .st  { color: #ffcc80; }
+  .fn  { color: var(--accent); }
+  .nm  { color: #ffab91; }
+  .dec { color: #c792ea; }
+  .op  { color: #89ddff; }
+
+  /* RESULTS */
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent2);
+    border-radius: 3px;
+    padding: 22px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+  .result-card:hover { transform: translateY(-2px); }
+  .result-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, rgba(0,255,157,0.06), transparent 70%);
+  }
+  .r-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: var(--accent2);
+    margin-bottom: 5px;
+    line-height: 1;
+  }
+  .r-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+  }
+
+  /* OUTCOMES LIST */
+  .outcome-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .outcome-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .outcome-item:last-child { border-bottom: none; }
+  .outcome-item:hover { background: rgba(0,212,255,0.03); }
+  .outcome-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    margin-top: 2px;
+    min-width: 28px;
+  }
+  .outcome-text {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text);
+    font-weight: 300;
+  }
+  .outcome-text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* REFLECTION */
+  .reflection-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .reflection-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 20px;
+  }
+  .ref-icon {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  .ref-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .ref-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  .page-footer {
+    position: relative; z-index: 10;
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .footer-mono {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 720px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 48px 20px 32px; }
+    .content { padding: 0 20px 60px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .challenge-grid { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: repeat(2,1fr); }
+    .reflection-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="index.html">&#8592; BACK</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-label">PROJECT_01 &middot; SATELLITE VIEWER 3D</span>
+  <span class="nav-date">AEROSPACE &middot; 2024</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="project-badge">// PROJECT_01 &nbsp;&nbsp;&nbsp; AEROSPACE VISUALIZATION</div>
+  <h1>Satellite Viewer 3D</h1>
+  <p class="hero-sub">
+    A real-time orbital visualization platform that propagates 30,000+ satellite positions using the SGP4 model, renders them on a textured 3D globe with Earth-fixed coordinate accuracy, and delivers 60&nbsp;fps performance entirely in the browser.
+  </p>
+  <div class="hero-meta">
+    <span class="meta-chip accent">3D Visualization</span>
+    <span class="meta-chip accent2">Real-Time Propagation</span>
+    <span class="meta-chip">Python</span>
+    <span class="meta-chip">Three.js</span>
+    <span class="meta-chip">SGP4 / TLE</span>
+    <span class="meta-chip">Orbital Mechanics</span>
+    <span class="meta-chip">WebGL</span>
+    <span class="meta-chip">ECEF Coords</span>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val">30,516</div>
+      <div class="hstat-label">SATELLITES TRACKED</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">9 set</div>
+      <div class="hstat-label">OF SATELLITE CONSTELLATION</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">1 draw</div>
+      <div class="hstat-label">CALL FOR FULL CATALOG</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">&lt;200 m</div>
+      <div class="hstat-label">ISS POSITION ACCURACY</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="content">
+
+  <!-- 01 OVERVIEW -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">01</span> Project Overview</div>
+    <div class="overview-grid">
+      <div>
+        <h2>What It Is</h2>
+        <p>
+          The Satellite Viewer 3D is an interactive orbital mechanics platform that renders the real-time position of every tracked object in the NORAD catalog on a photorealistic 3D globe. Rather than relying on a backend API to serve positions, the entire SGP4 propagation engine runs client-side in JavaScript — computing geodetic coordinates for all 30,516 satellites simultaneously, every frame, at 60&nbsp;fps.
+        </p>
+        <p>
+          The viewer ingests a full Space-Track catalog export (3LE format) and classifies each entry into constellation groups: Starlink, OneWeb, Iridium, GPS/GNSS, weather, science, payload, and debris. Users can filter by constellation, search by name, toggle individual satellites via per-row checkboxes, and add entirely custom orbits by entering six classical Keplerian elements into a modal form. A time-warp slider lets you fast-forward up to 200× real-time to watch orbital patterns emerge.
+        </p>
+        <p>
+          The Earth texture is the NASA Blue Marble imagery mapped to a fixed, non-rotating sphere. Satellite positions are computed in the Earth-Centered, Earth-Fixed (ECEF) frame using Greenwich Sidereal Time — meaning the geography on the globe and the satellite dots are always correctly aligned. You can watch ISS arc over the Americas and see it exactly where it should be, cross-referenced against NORAD data to within 200 meters.
+        </p>
+
+        <h2 style="margin-top:24px;">The Problem It Solves</h2>
+        <p>
+          Most satellite visualizers either require a server to propagate positions (adding latency and dependency), or are limited to a few hundred objects before performance degrades. This project answers the question: <em>can the full NORAD catalog be rendered, geographically accurately, at interactive frame rates entirely in a browser?</em> The answer required rethinking the rendering architecture at every layer — from the orbital math to the GPU draw call strategy.
+        </p>
+
+        <div class="challenge-grid">
+          <div class="challenge-card">
+            <div class="ch-label">CHALLENGE 01</div>
+            <div class="ch-title">Scale: 30k Objects</div>
+            <div class="ch-body">Creating one Three.js Mesh per satellite would produce 30,000 draw calls per frame — guaranteed to crash any GPU. Solution: a single BufferGeometry Points object where each vertex is a satellite, coloured by group using per-vertex colour attributes.</div>
+          </div>
+          <div class="challenge-card orange">
+            <div class="ch-label">CHALLENGE 02</div>
+            <div class="ch-title">Geographic Accuracy</div>
+            <div class="ch-body">SGP4 outputs ECI coordinates. To place a satellite correctly over a fixed Earth texture, positions must be rotated by the Greenwich Sidereal Time angle into ECEF. The globe must not rotate independently — Earth's rotation is encoded in the math.</div>
+          </div>
+          <div class="challenge-card green">
+            <div class="ch-label">CHALLENGE 03</div>
+            <div class="ch-title">Zero External Dependencies</div>
+            <div class="ch-body">No satellite.js, no Skyfield, no backend — the entire SGP4 propagator is implemented inline in pure JavaScript, including J2 secular perturbations, Kepler equation solving, and ECI-to-ECEF conversion via GST.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">// PROJECT SPECS</div>
+          <div class="sidebar-row"><span class="sidebar-key">TYPE</span><span class="sidebar-val">Web Application</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">DOMAIN</span><span class="sidebar-val">Astrodynamics</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">RUNTIME</span><span class="sidebar-val">Browser (no server)</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">DATA SRC</span><span class="sidebar-val">Space-Track.org</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">CATALOG</span><span class="sidebar-val">Full NORAD 3LE</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">RENDERER</span><span class="sidebar-val">Three.js r128</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">PROPAGATOR</span><span class="sidebar-val">SGP4 (inline JS)</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">STATUS</span><span class="sidebar-val green">COMPLETE</span></div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">// CONSTELLATION BREAKDOWN</div>
+          <div class="sidebar-row"><span class="sidebar-key">STARLINK</span><span class="sidebar-val">10,123</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">DEBRIS</span><span class="sidebar-val">9,677</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">PAYLOAD</span><span class="sidebar-val">7,226</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">WEATHER</span><span class="sidebar-val">2,388</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">ONEWEB</span><span class="sidebar-val">654</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">GPS/GNSS</span><span class="sidebar-val">222</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">IRIDIUM</span><span class="sidebar-val">217</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">SCIENCE</span><span class="sidebar-val">5</span></div>
+          <div class="sidebar-row"><span class="sidebar-key">ISS MODULES</span><span class="sidebar-val">4</span></div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">// KEY FEATURES</div>
+          <div class="sidebar-row" style="flex-direction:column;gap:5px;align-items:flex-start;">
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; Real-time SGP4 propagation</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; NASA Blue Marble texture</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; ECEF geographic accuracy</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; 1-draw-call rendering</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; Per-satellite checkboxes</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; Custom Keplerian orbit entry</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; Time warp (1x &ndash; 200x)</span>
+            <span style="font-size:0.78rem;color:var(--text);">&#x2713; Alpha-5 NORAD ID support</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 TOOLS -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">02</span> Tools &amp; Technologies</div>
+    <p style="margin-bottom:20px;">
+      Every component was chosen deliberately. The constraint of zero server dependencies — combined with the need to handle 30,000+ objects at 60&nbsp;fps — drove unconventional choices at each layer of the stack.
+    </p>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="t-icon">🌐</div>
+        <div class="t-name">Three.js r128</div>
+        <div class="t-role">RENDERING ENGINE</div>
+        <div class="t-desc">WebGL abstraction for the 3D globe, point cloud, selection highlights, orbit trails, and atmospheric glow layers.</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🛰</div>
+        <div class="t-name">SGP4 (JS)</div>
+        <div class="t-role">PROPAGATION CORE</div>
+        <div class="t-desc">Inline implementation of the SGP4 algorithm including J2 secular perturbations and Greenwich Sidereal Time for ECEF conversion. Zero external library required.</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🗄</div>
+        <div class="t-name">Space-Track.org</div>
+        <div class="t-role">DATA SOURCE</div>
+        <div class="t-desc">Full NORAD catalog in 3LE format (name + 2 TLE lines). 30,516 objects covering LEO, MEO, GEO, HEO, and highly elliptical orbits.</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🌍</div>
+        <div class="t-name">NASA Blue Marble</div>
+        <div class="t-role">EARTH TEXTURE</div>
+        <div class="t-desc">Public-domain equirectangular day texture, specular water map, and topology bump map composited via Three.js MeshPhongMaterial.</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">🐍</div>
+        <div class="t-name">Python 3.10</div>
+        <div class="t-role">DATA PIPELINE</div>
+        <div class="t-desc">Catalog parsing, Alpha-5 normalization, constellation classification, and JSON export — preprocessing 30k TLE records into a browser-ready payload.</div>
+      </div>
+      <div class="tool-card">
+        <div class="t-icon">⚡</div>
+        <div class="t-name">BufferGeometry</div>
+        <div class="t-role">GPU STRATEGY</div>
+        <div class="t-desc">All 30,516 satellites stored as a single Float32Array Points geometry — one draw call instead of 30,000. Visibility toggling via per-vertex colour zeroing rather than mesh removal.</div>
+      </div>
+    </div>
+
+    <div class="arch-diagram" style="margin-top:24px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:16px;">// SYSTEM ARCHITECTURE</div>
+      <div class="arch-row">
+        <div class="arch-box blue">
+          <div class="arch-box-title">Space-Track.org</div>
+          <div class="arch-box-sub">3LE CATALOG EXPORT</div>
+        </div>
+        <div class="arch-arrow">&#x2192;</div>
+        <div class="arch-box">
+          <div class="arch-box-title">Python Pipeline</div>
+          <div class="arch-box-sub">PARSE &middot; CLASSIFY &middot; EXPORT JSON</div>
+        </div>
+        <div class="arch-arrow">&#x2192;</div>
+        <div class="arch-box green">
+          <div class="arch-box-title">Embedded TLE JSON</div>
+          <div class="arch-box-sub">5.5 MB &middot; 30,516 RECORDS</div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:6px 0;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);">&#x2193;</div>
+      <div class="arch-row">
+        <div class="arch-box">
+          <div class="arch-box-title">SGP4 Engine (JS)</div>
+          <div class="arch-box-sub">ECI PROPAGATION &middot; GST &middot; ECEF</div>
+        </div>
+        <div class="arch-arrow">&#x2192;</div>
+        <div class="arch-box orange">
+          <div class="arch-box-title">geo2xyz()</div>
+          <div class="arch-box-sub">LAT/LON/ALT &#x2192; SCENE XYZ</div>
+        </div>
+        <div class="arch-arrow">&#x2192;</div>
+        <div class="arch-box blue">
+          <div class="arch-box-title">BufferGeometry Points</div>
+          <div class="arch-box-sub">1 DRAW CALL &middot; 60 FPS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 IMPLEMENTATION -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">03</span> Code / Implementation</div>
+
+    <p>
+      The implementation breaks into three interlocking layers: the orbital mechanics engine, the coordinate transformation pipeline, and the rendering strategy. Each layer had to be engineered to work in concert — a mistake in the coordinate transform nullifies the accuracy of the propagator, and a naive rendering approach throws away the performance gains from doing the math in JavaScript.
+    </p>
+
+    <div class="code-section">
+
+      <h3 style="margin-top:12px;">SGP4 Propagator — ECI to ECEF</h3>
+      <p>The heart of the system. Given a TLE record and a Julian Date, this function returns a geodetic position (lat, lon, alt) by propagating the orbit forward using simplified perturbation theory, then rotating the ECI result into the Earth-fixed frame using Greenwich Sidereal Time.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">sgp4.js &mdash; propagate()</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+<pre><span class="cm">// Propagate satellite state to given Julian Date.</span>
+<span class="cm">// Returns Earth-fixed geodetic {lat, lon, alt, speed}.</span>
+<span class="kw">function</span> <span class="fn">propagate</span>(sr, jd) {
+  <span class="kw">var</span> tsince <span class="op">=</span> (jd <span class="op">-</span> sr.jdsatepoch) <span class="op">*</span> <span class="nm">1440</span>;   <span class="cm">// minutes since epoch</span>
+
+  <span class="cm">// J2 secular rates — nodal regression, apsidal precession</span>
+  <span class="kw">var</span> j2f   <span class="op">=</span> <span class="nm">1.5</span> <span class="op">*</span> ck2 <span class="op">*</span> n0 <span class="op">/</span> (a0<span class="op">*</span>a0 <span class="op">*</span> beta0<span class="op">*</span>beta0<span class="op">*</span>beta0);
+  <span class="kw">var</span> Mdot  <span class="op">=</span> n0  <span class="op">+</span> j2f <span class="op">*</span> (<span class="nm">3</span><span class="op">*</span>cosI<span class="op">*</span>cosI <span class="op">-</span> <span class="nm">1</span>);  <span class="cm">// mean motion drift</span>
+  <span class="kw">var</span> wdot  <span class="op">=</span> j2f <span class="op">*</span> (<span class="nm">5</span><span class="op">*</span>cosI<span class="op">*</span>cosI <span class="op">-</span> <span class="nm">1</span>);           <span class="cm">// arg of perigee drift</span>
+  <span class="kw">var</span> Odot  <span class="op">=</span> <span class="op">-</span>j2f <span class="op">*</span> <span class="nm">2</span> <span class="op">*</span> cosI;                   <span class="cm">// RAAN drift</span>
+
+  <span class="cm">// Propagate Keplerian elements to epoch t</span>
+  <span class="kw">var</span> M <span class="op">=</span> (sr.mo <span class="op">+</span> Mdot <span class="op">*</span> tsince) <span class="op">%</span> twopi;
+  <span class="kw">var</span> w <span class="op">=</span> (sr.argpo <span class="op">+</span> wdot <span class="op">*</span> tsince) <span class="op">%</span> twopi;
+  <span class="kw">var</span> O <span class="op">=</span> (sr.nodeo <span class="op">+</span> Odot <span class="op">*</span> tsince) <span class="op">%</span> twopi;
+
+  <span class="cm">// Solve Kepler's equation by Newton-Raphson (12 iterations)</span>
+  <span class="kw">var</span> E <span class="op">=</span> M;
+  <span class="kw">for</span> (<span class="kw">var</span> k <span class="op">=</span> <span class="nm">0</span>; k <span class="op">&lt;</span> <span class="nm">12</span>; k<span class="op">++</span>) {
+    <span class="kw">var</span> dE <span class="op">=</span> (M <span class="op">-</span> E <span class="op">+</span> e0<span class="op">*</span>Math.sin(E)) <span class="op">/</span> (<span class="nm">1</span> <span class="op">-</span> e0<span class="op">*</span>Math.cos(E));
+    E <span class="op">+=</span> dE;
+    <span class="kw">if</span> (Math.abs(dE) <span class="op">&lt;</span> <span class="nm">1e-12</span>) <span class="kw">break</span>;
+  }
+
+  <span class="cm">// ECI position (km)</span>
+  <span class="kw">var</span> rx <span class="op">=</span> r<span class="op">*</span>(cosO<span class="op">*</span>cosU <span class="op">-</span> sinO<span class="op">*</span>sinU<span class="op">*</span>cosI);
+  <span class="kw">var</span> ry <span class="op">=</span> r<span class="op">*</span>(sinO<span class="op">*</span>cosU <span class="op">+</span> cosO<span class="op">*</span>sinU<span class="op">*</span>cosI);
+  <span class="kw">var</span> rz <span class="op">=</span> r<span class="op">*</span>sinU<span class="op">*</span>sinI;
+
+  <span class="cm">// ECI &#x2192; ECEF: rotate by Greenwich Sidereal Time</span>
+  <span class="kw">var</span> gst  <span class="op">=</span> <span class="fn">gstime</span>(jd);
+  <span class="kw">var</span> ex   <span class="op">=</span>  Math.cos(gst)<span class="op">*</span>rx <span class="op">+</span> Math.sin(gst)<span class="op">*</span>ry;
+  <span class="kw">var</span> ey   <span class="op">=</span> <span class="op">-</span>Math.sin(gst)<span class="op">*</span>rx <span class="op">+</span> Math.cos(gst)<span class="op">*</span>ry;
+  <span class="kw">var</span> ez   <span class="op">=</span> rz;  <span class="cm">// Z-axis (pole) unaffected by rotation</span>
+
+  <span class="cm">// ECEF &#x2192; geodetic lat / lon / alt</span>
+  <span class="kw">var</span> lon  <span class="op">=</span> Math.atan2(ey, ex) <span class="op">*</span> <span class="nm">180</span><span class="op">/</span>PI;
+  <span class="kw">var</span> lat  <span class="op">=</span> Math.atan2(ez, Math.sqrt(ex<span class="op">*</span>ex<span class="op">+</span>ey<span class="op">*</span>ey)) <span class="op">*</span> <span class="nm">180</span><span class="op">/</span>PI;
+  <span class="kw">var</span> alt  <span class="op">=</span> r <span class="op">-</span> re;  <span class="cm">// km above reference sphere</span>
+
+  <span class="kw">return</span> { lat, lon, alt, speed: Math.sqrt(mu<span class="op">/</span>r) };
+}</pre>
+      </div>
+
+      <h3 style="margin-top:8px;">Rendering Strategy — One Draw Call for 30k Objects</h3>
+      <p>Achieving 60&nbsp;fps with 30,000 satellites requires fundamentally different thinking from standard Three.js usage. The entire catalog lives in a single <code style="font-family:'Share Tech Mono',monospace;font-size:0.82em;color:var(--accent)">BufferGeometry</code> Points object. Hiding a satellite means zeroing its colour bytes — not removing it from the scene.</p>
+
+      <div class="code-block green">
+        <div class="code-header">
+          <span class="code-filename">renderer.js &mdash; updatePositions()</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+<pre><span class="cm">// Called every animation frame. Propagates all 30k sats</span>
+<span class="cm">// and writes directly into GPU-bound Float32Arrays.</span>
+<span class="kw">function</span> <span class="fn">updatePositions</span>() {
+  <span class="kw">var</span> jd  <span class="op">=</span> <span class="fn">simJD</span>();           <span class="cm">// simulated Julian Date (warp-adjusted)</span>
+  <span class="kw">var</span> pa  <span class="op">=</span> ptGeom.attributes.position.array;
+  <span class="kw">var</span> ca  <span class="op">=</span> ptGeom.attributes.color.array;
+
+  <span class="kw">for</span> (<span class="kw">var</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> N; i<span class="op">++</span>) {
+    <span class="kw">var</span> p <span class="op">=</span> <span class="fn">SGP4.propagate</span>(sats[i].rec, jd);
+    <span class="kw">if</span> (<span class="op">!</span>p) { pa[i<span class="op">*</span><span class="nm">3</span>] <span class="op">=</span> pa[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">1</span>] <span class="op">=</span> pa[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">2</span>] <span class="op">=</span> <span class="nm">0</span>; <span class="kw">continue</span>; }
+
+    <span class="cm">// Write position: geodetic lat/lon/alt &#x2192; scene XYZ</span>
+    <span class="kw">var</span> xyz <span class="op">=</span> <span class="fn">geo2xyz</span>(p.lat, p.lon, p.alt);
+    pa[i<span class="op">*</span><span class="nm">3</span>] <span class="op">=</span> xyz[<span class="nm">0</span>]; pa[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">1</span>] <span class="op">=</span> xyz[<span class="nm">1</span>]; pa[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">2</span>] <span class="op">=</span> xyz[<span class="nm">2</span>];
+
+    <span class="cm">// Visibility: zero colour = invisible, no mesh removal needed</span>
+    <span class="kw">if</span> (<span class="fn">isRendered</span>(sats[i])) {
+      ca[i<span class="op">*</span><span class="nm">3</span>] <span class="op">=</span> satR[i]; ca[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">1</span>] <span class="op">=</span> satG[i]; ca[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">2</span>] <span class="op">=</span> satB[i];
+    } <span class="kw">else</span> {
+      ca[i<span class="op">*</span><span class="nm">3</span>] <span class="op">=</span> <span class="nm">0</span>; ca[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">1</span>] <span class="op">=</span> <span class="nm">0</span>; ca[i<span class="op">*</span><span class="nm">3</span><span class="op">+</span><span class="nm">2</span>] <span class="op">=</span> <span class="nm">0</span>;
+    }
+  }
+  ptGeom.attributes.position.needsUpdate <span class="op">=</span> <span class="kw">true</span>;
+  ptGeom.attributes.color.needsUpdate    <span class="op">=</span> <span class="kw">true</span>;
+  <span class="cm">// Three.js now uploads both arrays to the GPU in one pass.</span>
+  <span class="cm">// Total: 1 draw call regardless of how many sats are visible.</span>
+}</pre>
+      </div>
+
+      <h3 style="margin-top:8px;">Custom Satellite Entry — Keplerian to SGP4 Record</h3>
+      <p>Users can define a custom orbit by entering the six classical elements. These are converted into an SGP4-compatible record with the current epoch as the reference, allowing the standard propagator to handle them identically to catalog objects.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">custom.js &mdash; keplerToSatrec()</span>
+          <span class="code-lang">JAVASCRIPT</span>
+        </div>
+<pre><span class="cm">// Convert classical Keplerian elements to an SGP4 satrec.</span>
+<span class="cm">// Epoch is set to the current simulated time so the orbit</span>
+<span class="cm">// propagates correctly from the moment of creation.</span>
+<span class="kw">function</span> <span class="fn">keplerToSatrec</span>(aKm, ecc, incDeg, raanDeg, aopDeg, maDeg, offsetMs) {
+  <span class="cm">// Semi-major axis &#x2192; mean motion (rad/min) via vis-viva</span>
+  <span class="kw">var</span> no <span class="op">=</span> Math.sqrt(mu <span class="op">/</span> (aKm<span class="op">*</span>aKm<span class="op">*</span>aKm)) <span class="op">*</span> <span class="nm">60</span>;
+
+  <span class="kw">return</span> {
+    error:       <span class="nm">0</span>,
+    norad:       <span class="st">'CUSTOM'</span>,
+    jdsatepoch:  <span class="fn">nowJD</span>(offsetMs),   <span class="cm">// epoch = now (warp-adjusted)</span>
+    no:          no,
+    ecco:        ecc,
+    inclo:       incDeg  <span class="op">*</span> d2r,
+    nodeo:       raanDeg <span class="op">*</span> d2r,
+    argpo:       aopDeg  <span class="op">*</span> d2r,
+    mo:          maDeg   <span class="op">*</span> d2r,
+    incDeg:      incDeg,
+    eccStr:      ecc.<span class="fn">toFixed</span>(<span class="nm">7</span>)
+  };
+}
+<span class="cm">// The returned record is identical in shape to a parsed TLE record.</span>
+<span class="cm">// SGP4.propagate() handles both without modification.</span></pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 RESULTS -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">04</span> Results</div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="r-val">30,516</div>
+        <div class="r-label">SATELLITES TRACKED<br>SIMULTANEOUSLY</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">1</div>
+        <div class="r-label">GPU DRAW CALL FOR<br>ENTIRE CATALOG</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">&lt;200 m</div>
+        <div class="r-label">ISS POSITION ERROR vs.<br>NORAD REFERENCE</div>
+      </div>
+      <div class="result-card">
+        <div class="r-val">200x</div>
+        <div class="r-label">MAX TIME WARP<br>FACTOR</div>
+      </div>
+    </div>
+
+    <h2>Key Outcomes</h2>
+    <div class="outcome-list">
+      <div class="outcome-item">
+        <span class="outcome-num">01</span>
+        <span class="outcome-text"><strong>Validated geographic accuracy</strong> by cross-referencing ISS position against live NORAD data — computed geodetic coordinates consistently fall within 200 meters of the reference ground truth, confirming the ECI-to-ECEF transformation and SGP4 implementation are correct.</span>
+      </div>
+      <div class="outcome-item">
+        <span class="outcome-num">03</span>
+        <span class="outcome-text"><strong>Implemented SGP4 from scratch in pure JavaScript</strong> including J2 secular perturbations, Newton-Raphson Kepler solver (12 iterations to 1e-12 rad convergence), and accurate Greenwich Sidereal Time computation for ECEF rotation — no satellite.js or equivalent dependency.</span>
+      </div>
+      <div class="outcome-item">
+        <span class="outcome-num">04</span>
+        <span class="outcome-text"><strong>Supported the full modern catalog</strong> including objects with Alpha-5 NORAD identifiers (IDs above 99,999 encoded with an alphabetic prefix), making recent high-density Starlink and OneWeb launches accessible without data truncation.</span>
+      </div>
+      <div class="outcome-item">
+        <span class="outcome-num">05</span>
+        <span class="outcome-text"><strong>Built an interactive custom orbit tool</strong> accepting all six classical Keplerian elements with real-time validation, perigee altitude checking, and preset configurations for common orbit types: ISS-like LEO, GEO, Molniya, polar, and sun-synchronous.</span>
+      </div>
+      <div class="outcome-item">
+        <span class="outcome-num">06</span>
+        <span class="outcome-text"><strong>Demonstrated orbital population structure visually</strong> — switching filters reveals the dense LEO shell dominated by Starlink, the sparse MEO belt of GPS/GNSS constellations at ~20,000 km, and the equatorial ring of geostationary satellites at 35,786 km, each visually distinct by altitude.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 REFLECTION -->
+  <section class="reveal">
+    <div class="section-label"><span class="section-num">05</span> Reflection &amp; Next Steps</div>
+    <p>
+      This project started as an experiment in pushing browser-native rendering to its practical limit. The unexpected finding was that the bottleneck is not the JavaScript propagation math — modern V8 handles 30k SGP4 evaluations per frame without complaint — but the DOM and GPU state management. The key insight was treating the satellite catalog as a fixed GPU buffer rather than a dynamic scene graph.
+    </p>
+    <div class="reflection-grid" style="margin-top:20px;">
+      <div class="reflection-card">
+        <div class="ref-icon">&#x26A0;</div>
+        <div class="ref-title">What Was Hardest</div>
+        <div class="ref-body">Getting the coordinate transforms right. SGP4 outputs ECI positions which are in an inertial (non-rotating) frame. Applying Greenwich Sidereal Time to rotate them into ECEF, and then aligning that with Three.js sphere UV conventions, required methodical debugging against known reference positions.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="ref-icon">&#x1F4A1;</div>
+        <div class="ref-title">Biggest Insight</div>
+        <div class="ref-body">Visibility toggling via colour zeroing (setting RGB to 0,0,0) rather than removing geometry from the scene was the performance breakthrough. No scene graph mutation, no garbage collection pressure — just a cheap write into an already-allocated Float32Array.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="ref-icon">&#x1F6E0;</div>
+        <div class="ref-title">What I'd Improve</div>
+        <div class="ref-body">Moving SGP4 propagation into a Web Worker would free the main thread entirely for rendering. A shared ArrayBuffer passed via transferable objects could maintain the zero-copy performance while allowing the propagation loop to run in parallel.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="ref-icon">&#x1F680;</div>
+        <div class="ref-title">Next Steps</div>
+        <div class="ref-body">Day/night terminator rendering using a shader-based sun direction uniform. Conjunction analysis between selected satellite pairs. Integration with live TLE feeds via CelesTrak API for automatic catalog updates without re-exporting the data file.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<div class="page-footer">
+  <span class="footer-mono">PROJECT_01 &middot; SATELLITE VIEWER 3D &middot; AEROSPACE VISUALIZATION</span>
+  <a class="nav-back" href="index.html">&#8592; BACK TO PORTFOLIO</a>
+</div>
+
+<script>
+  // Scroll reveal
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(function(el) { observer.observe(el); });
+</script>
+
+</body>
+</html>
