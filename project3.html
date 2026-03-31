@@ -6,10 +6,10 @@
 <title>Project 03 — AM &amp; FM Modulation/Demodulation</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#c678ff;--accent2:#ff6b9d;--accent3:#00d4ff;--text:#c8dde8;--muted:#4a6a80; }
+  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#00d4ff;--accent2:#00ff9d;--accent3:#ff6b35;--text:#c8dde8;--muted:#4a6a80; }
   * { margin:0;padding:0;box-sizing:border-box; }
   body { background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh; }
-  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(198,120,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(198,120,255,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
+  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,212,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.018) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
   nav { position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:20px 40px;border-bottom:1px solid var(--border); }
   .nav-back { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);text-decoration:none;letter-spacing:0.15em;transition:opacity 0.2s; }
   .nav-back:hover { opacity:0.7; }
@@ -56,7 +56,16 @@
   .video-btn { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-decoration:none;padding:10px 20px;border:1px solid var(--accent);color:var(--accent);background:rgba(198,120,255,0.06);white-space:nowrap;transition:background 0.2s,color 0.2s; }
   .video-btn:hover { background:rgba(198,120,255,0.18);color:#fff; }
   .video-btn svg { flex-shrink:0; }
-  @media (max-width:600px) { nav{padding:16px 20px;} .hero{padding:40px 20px 30px;} .content{padding:0 20px 60px;} .compare-grid{grid-template-columns:1fr;} .video-card{flex-direction:column;align-items:flex-start;} }
+  /* DEMO BOX */
+  .demo-row { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+  .demo-box { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--card);border:1px solid var(--accent);border-radius:4px;padding:36px 28px;text-align:center;position:relative;overflow:hidden; }
+  .demo-box::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,212,255,0.06) 0%,transparent 70%);pointer-events:none; }
+  .demo-box-label { font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase; }
+  .demo-box-title { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;letter-spacing:0.05em; }
+  .demo-btn { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--bg);background:var(--accent);border:none;border-radius:2px;padding:12px 26px;text-decoration:none;cursor:pointer;transition:background 0.2s,transform 0.15s,box-shadow 0.2s;box-shadow:0 0 20px rgba(0,212,255,0.25);position:relative;z-index:1; }
+  .demo-btn:hover { background:#33ddff;transform:translateY(-2px);box-shadow:0 0 32px rgba(0,212,255,0.45); }
+  .demo-btn svg { width:13px;height:13px;fill:var(--bg);flex-shrink:0; }
+  @media (max-width:600px) { nav{padding:16px 20px;} .hero{padding:40px 20px 30px;} .content{padding:0 20px 60px;} .compare-grid{grid-template-columns:1fr;} .video-card{flex-direction:column;align-items:flex-start;} .demo-row{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -83,6 +92,29 @@
 <div class="section-divider"></div>
 
 <div class="content">
+
+  <!-- 00 DEMO VIDEOS -->
+  <section>
+    <div class="section-label">00 &nbsp; Demo Videos</div>
+    <div class="demo-row">
+      <div class="demo-box">
+        <div class="demo-box-label">Demo Video · AM</div>
+        <div class="demo-box-title">AM Modulation Demo Video</div>
+        <a class="demo-btn" href="https://www.youtube.com/watch?v=vb6qQrqGigM" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.8 8.001a2.749 2.749 0 0 0-1.935-1.946C18.07 5.5 12 5.5 12 5.5s-6.07 0-7.865.555A2.749 2.749 0 0 0 2.2 8.001 28.8 28.8 0 0 0 1.65 12a28.8 28.8 0 0 0 .55 3.999 2.749 2.749 0 0 0 1.935 1.946C5.93 18.5 12 18.5 12 18.5s6.07 0 7.865-.555a2.749 2.749 0 0 0 1.935-1.946A28.8 28.8 0 0 0 22.35 12a28.8 28.8 0 0 0-.55-3.999zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+          Watch on YouTube
+        </a>
+      </div>
+      <div class="demo-box">
+        <div class="demo-box-label">Demo Video · FM</div>
+        <div class="demo-box-title">FM Modulation Demo Video</div>
+        <a class="demo-btn" href="https://www.youtube.com/watch?v=nwiyzPaBruA" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.8 8.001a2.749 2.749 0 0 0-1.935-1.946C18.07 5.5 12 5.5 12 5.5s-6.07 0-7.865.555A2.749 2.749 0 0 0 2.2 8.001 28.8 28.8 0 0 0 1.65 12a28.8 28.8 0 0 0 .55 3.999 2.749 2.749 0 0 0 1.935 1.946C5.93 18.5 12 18.5 12 18.5s6.07 0 7.865-.555a2.749 2.749 0 0 0 1.935-1.946A28.8 28.8 0 0 0 22.35 12a28.8 28.8 0 0 0-.55-3.999zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+          Watch on YouTube
+        </a>
+      </div>
+    </div>
+  </section>
 
   <section>
     <div class="section-label">01 &nbsp; Description</div>
@@ -146,40 +178,7 @@
   </section>
 
   <section>
-    <div class="section-label">03 Demo Video</div>
-
-  <div class="video-block">
-
-    <div class="video-card">
-      <div class="video-card-info">
-        <span class="video-card-label">Demo Video · AM</span>
-        <div class="video-card-title">Arduino — AM Modulation &amp; Demodulation</div>
-        <p class="video-card-note">Carrier envelope capture, modulation index measurement, envelope detector demodulation</p>
-      </div>
-      <a class="video-btn" href="https://www.youtube.com/watch?v=vb6qQrqGigM" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
-        WATCH ON YOUTUBE
-      </a>
-    </div>
-
-    <div class="video-card">
-      <div class="video-card-info">
-        <span class="video-card-label">Demo Video · FM</span>
-        <div class="video-card-title">Arduino — FM Modulation &amp; Demodulation</div>
-        <p class="video-card-note">Frequency deviation, Carson's Rule bandwidth verification, PLL demodulation output</p>
-      </div>
-      <a class="video-btn" href="https://www.youtube.com/watch?v=nwiyzPaBruA" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
-        WATCH ON YOUTUBE
-      </a>
-    </div>
-
-  </div>
-
-  </section>
-
-  <section>
-    <div class="section-label">04 &nbsp; Results</div>
+    <div class="section-label">03 &nbsp; Results</div>
     <div class="result-grid">
       <div class="result-card">
         <div class="r-val">μ = 0.8</div>
