@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMEM UAS L-Band RF LOS Link Budget Simulator</title>
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: #111827;
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --accent: #f59e0b; 
+            --cyan: #06b6d4;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            margin-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { margin: 0; font-size: 1.4rem; color: var(--cyan); }
+        p { margin: 0.2rem 0 0 0; color: var(--text-muted); font-size: 0.85rem; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 1rem;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1rem;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        .section-title {
+            color: var(--cyan);
+            font-weight: bold;
+            margin-top: 0.8rem;
+            margin-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #030712;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label {
+            color: var(--text-muted);
+            width: 60%;
+        }
+
+        input, select {
+            width: 38%;
+            background: #1f2937;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 2px;
+            text-align: right;
+            box-sizing: border-box;
+        }
+
+        select {
+            text-align-last: right;
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            outline: 1px solid var(--cyan);
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px; 
+            background: rgba(17, 24, 39, 0.95);
+            padding: 0.8rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            pointer-events: none;
+            font-size: 0.8rem;
+            min-width: 320px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .target-box {
+            background: #111827;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .pass { background: #065f46; color: #34d399; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SMEM UAS DO-362 L-Band LOS Link Budget Simulator</h1>
+    <p>Mission Profile: LCS-2 Ship Downlink Analysis (Southeast Asia Deployment)</p>
+</header>
+
+<div class="main-layout">
+    <div class="sidebar">
+        <div class="section-title">Analysis Mode Selection</div>
+        <div class="input-group">
+            <label style="color: #f59e0b; font-weight: bold;">Budget Target</label>
+            <select id="analysisMode">
+                <option value="prediction">Hardware Prediction (37dB)</option>
+                <option value="allocation">Requirements Allocation (35dB)</option>
+                <option value="baseline">Baseline (31.5dB)</option>
+            </select>
+        </div>
+
+        <div class="section-title">Link Parameters</div>
+        <div class="input-group">
+            <label>Range, R (NM)</label>
+            <input type="number" id="rangeNm" value="10" step="any">
+        </div>
+        <div class="input-group">
+            <label>Frequency (MHz)</label>
+            <input type="number" id="freq" value="1060.5" step="any">
+        </div>
+        <div class="input-group">
+            <label>Data Rate, Rdata (bps)</label>
+            <input type="number" id="dataRate" value="138000">
+        </div>
+        <div class="input-group">
+            <label>Bandwidth, B (Hz)</label>
+            <input type="number" id="bandwidth" value="120000">
+        </div>
+
+        <div class="section-title">UAV Transmitter (TX)</div>
+        <div class="input-group">
+            <label>Tx Power (dBm)</label>
+            <input type="number" id="txPower" value="15" step="any">
+        </div>
+        <div class="input-group">
+            <label>Tx Line Loss (dB)</label>
+            <input type="number" id="txLineLoss" value="1" step="any">
+        </div>
+        <div class="input-group">
+            <label>UAV Antenna Gain (dBi)</label>
+            <input type="number" id="txGain" value="13.155" step="any">
+        </div>
+        <div class="input-group">
+            <label>Tx Pointing Loss (dB)</label>
+            <input type="number" id="txPointingLoss" value="0.1" step="any">
+        </div>
+        <div class="input-group">
+            <label>Tx Radome Loss (dB)</label>
+            <input type="number" id="txRadomeLoss" value="0.5" step="any">
+        </div>
+
+        <div class="section-title">LCS-2 Receiver (RX)</div>
+        <div class="input-group">
+            <label>Rx Antenna Gain (dBi)</label>
+            <input type="number" id="rxGain" value="19" step="any">
+        </div>
+        <div class="input-group">
+            <label>Rx Polarization Loss (dB)</label>
+            <input type="number" id="rxPolarizationLoss" value="3" step="any">
+        </div>
+        <div class="input-group">
+            <label>Rx Line Loss (dB)</label>
+            <input type="number" id="rxLineLoss" value="1" step="any">
+        </div>
+        <div class="input-group">
+            <label>System Noise Figure (dB)</label>
+            <input type="number" id="rxNoise" value="4" step="any">
+        </div>
+        <div class="input-group">
+            <label>Required Eb/No (dB)</label>
+            <input type="number" id="reqEbNo" value="3.5" step="any">
+        </div>
+
+        <div class="section-title">Atmospheric Losses</div>
+        <div class="input-group">
+            <label>Atmospheric Absorption (dB)</label>
+            <input type="number" id="lossAtm" value="0.926" step="any">
+        </div>
+        <div class="input-group">
+            <label>Precipitation Loss (dB)</label>
+            <input type="number" id="lossRain" value="0.02" step="any">
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="smemCanvas"></canvas>
+        
+        <div class="hud-overlay">
+            <div style="color: var(--cyan); font-weight: bold; margin-bottom: 6px;">[LINK BUDGET VERIFICATION ANALYSIS]</div>
+            
+            <div class="metric-row"><span>EIRP:</span><span id="hudEirp">--</span></div>
+            <div class="metric-row"><span>Free Space Path Loss (FSPL):</span><span id="hudFspl">--</span></div>
+            <div class="metric-row"><span>Effective Carrier Power:</span><span id="hudPrx">--</span></div>
+            <div class="metric-row"><span>Effective Noise Power:</span><span id="hudNoise">--</span></div>
+            <div class="metric-row"><span>Available SNR:</span><span id="hudSnr" style="color: #6ee7b7;">--</span></div>
+            <div class="metric-row"><span>Required SNR:</span><span id="hudReqSnr">--</span></div>
+            
+            <div class="target-box" style="border: 1px solid var(--cyan); background: #1e1b4b;">
+                <div class="metric-row" style="font-size: 0.9rem; font-weight: bold;">
+                    <span>NET SIGNAL MARGIN:</span>
+                    <span id="hudMargin" style="color: #6ee7b7;">--</span>
+                </div>
+            </div>
+            <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>Link Health Status:</span>
+                <span id="hudStatus" class="badge pass">LINK OK</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('smemCanvas');
+    const ctx = canvas.getContext('2d');
+    let waveOffset = 0;
+
+    // Preset configurations matching columns in the spreadsheet
+    const presets = {
+        prediction: { txGain: 13.155, txPointing: 0.1, txRadome: 0.5 },
+        allocation: { txGain: 11.155, txPointing: 0.0, txRadome: 1.0 },
+        baseline:   { txGain: 7.660,  txPointing: 0.0, txRadome: 1.0 }
+    };
+
+    function handleModeChange() {
+        const mode = document.getElementById('analysisMode').value;
+        if (presets[mode]) {
+            document.getElementById('txGain').value = presets[mode].txGain;
+            document.getElementById('txPointingLoss').value = presets[mode].txPointing;
+            document.getElementById('txRadomeLoss').value = presets[mode].txRadome;
+        }
+        calculateSystemBudget();
+    }
+
+    document.getElementById('analysisMode').addEventListener('change', handleModeChange);
+
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function calculateSystemBudget() {
+        // Param retrievals
+        const rangeNm = parseFloat(document.getElementById('rangeNm').value) || 10;
+        const freq = parseFloat(document.getElementById('freq').value) || 1060.5;
+        const dataRate = parseFloat(document.getElementById('dataRate').value) || 138000;
+        const bandwidthHz = parseFloat(document.getElementById('bandwidth').value) || 120000;
+        
+        const txPower = parseFloat(document.getElementById('txPower').value) || 15;
+        const txLineLoss = parseFloat(document.getElementById('txLineLoss').value) || 1;
+        const txGain = parseFloat(document.getElementById('txGain').value) || 0;
+        const txPointingLoss = parseFloat(document.getElementById('txPointingLoss').value) || 0;
+        const txRadomeLoss = parseFloat(document.getElementById('txRadomeLoss').value) || 0;
+
+        const rxGain = parseFloat(document.getElementById('rxGain').value) || 19;
+        const rxPolarizationLoss = parseFloat(document.getElementById('rxPolarizationLoss').value) || 3;
+        const rxLineLoss = parseFloat(document.getElementById('rxLineLoss').value) || 1;
+        const rxNoise = parseFloat(document.getElementById('rxNoise').value) || 4;
+        const reqEbNo = parseFloat(document.getElementById('reqEbNo').value) || 3.5;
+
+        const lossAtm = parseFloat(document.getElementById('lossAtm').value) || 0;
+        const lossRain = parseFloat(document.getElementById('lossRain').value) || 0;
+
+        // --- MATH REPLICATING EXCEL WORKSPACE SHEET CELL LOGIC ---
+        // EIRP = Ptx - L_T,Line + Gt - L_T,point - L_T,radome
+        const eirp = txPower - txLineLoss + txGain - txPointingLoss - txRadomeLoss;
+
+        // Prop loss: FSPL + Absorption losses
+        const distanceKm = rangeNm * 1.852; 
+        const fspl = 20 * Math.log10(distanceKm) + 20 * Math.log10(freq) + 32.44;
+        const totalPropagationLoss = fspl + lossAtm + lossRain;
+
+        // Effective Carrier Power = EIRP - TotalPropLoss + Grx - RxPolarizationLoss - RxLineLoss
+        const prx = eirp - totalPropagationLoss + rxGain - rxPolarizationLoss - rxLineLoss;
+
+        // Noise Calculations
+        const rxNoiseBwDb = 10 * Math.log10(bandwidthHz);
+        const noiseFloor = -174 + rxNoiseBwDb + rxNoise;
+
+        // Available SNR and Required SNR based on Data Rate adjustments
+        const availableSnr = prx - noiseFloor;
+        const requiredSnr = reqEbNo + 10 * Math.log10(dataRate / bandwidthHz);
+        const linkMargin = availableSnr - requiredSnr;
+
+        // Push to interface elements
+        document.getElementById('hudEirp').innerText = eirp.toFixed(3) + ' dBm';
+        document.getElementById('hudFspl').innerText = '-' + fspl.toFixed(5) + ' dB';
+        document.getElementById('hudPrx').innerText = prx.toFixed(5) + ' dBm';
+        document.getElementById('hudNoise').innerText = noiseFloor.toFixed(5) + ' dBm';
+        document.getElementById('hudSnr').innerText = availableSnr.toFixed(5) + ' dB';
+        document.getElementById('hudReqSnr').innerText = requiredSnr.toFixed(5) + ' dB';
+        document.getElementById('hudMargin').innerText = linkMargin.toFixed(5) + ' dB';
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const uasX = 150;
+        const uasY = 120;
+        const shipX = canvas.width - 200;
+        const shipY = canvas.height - 120;
+
+        // Ocean Base Graphics
+        ctx.strokeStyle = '#1f2937';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath(); ctx.moveTo(i, canvas.height - 80); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+        ctx.fillStyle = '#0c4a6e'; 
+        ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+
+        // Render Ship Node
+        ctx.save();
+        ctx.translate(shipX, shipY);
+        ctx.fillStyle = '#64748b'; 
+        ctx.beginPath();
+        ctx.moveTo(-60, 40); ctx.lineTo(80, 40); ctx.lineTo(100, 10); ctx.lineTo(40, 10); ctx.lineTo(20, -10); ctx.lineTo(-40, -10);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(-20, -25, 15, Math.PI * 0.7, Math.PI * 1.3); ctx.stroke();
+        ctx.fillStyle = '#38bdf8'; ctx.fillText("LCS-2 RX STATION", -50, 60);
+        ctx.restore();
+
+        // Render Airborne Drone
+        ctx.save();
+        ctx.translate(uasX, uasY);
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath(); ctx.ellipse(0, 0, 35, 10, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(-35, -5, 8, 10);
+        ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-38, -18, 2, 36);
+        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(15, -15); ctx.stroke();
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, 10); ctx.lineTo(0, 25); ctx.stroke();
+        ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(0, 25, 3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.fillText("SMEM UAS (TX)", -40, -20);
+        ctx.restore();
+
+        // Wave Propagation Vectors 
+        ctx.save();
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(uasX, uasY + 25); ctx.lineTo(shipX - 20, shipY - 25); ctx.stroke();
+        ctx.restore();
+
+        waveOffset += 1;
+        if (waveOffset > 60) waveOffset = 0;
+
+        const dx = (shipX - 20) - uasX;
+        const dy = (shipY - 25) - (uasY + 25);
+        const distanceVector = Math.sqrt(dx*dx + dy*dy);
+        const waveAngle = Math.atan2(dy, dx);
+
+        for (let w = waveOffset; w < distanceVector; w += 60) {
+            const pct = w / distanceVector;
+            const cx = uasX + dx * pct;
+            const cy = (uasY + 25) + dy * pct;
+            ctx.save(); ctx.translate(cx, cy); ctx.rotate(waveAngle);
+            ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, 0, 15, -Math.PI/3, Math.PI/3); ctx.stroke();
+            ctx.restore();
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    // Interactive updates
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(element => element.addEventListener('input', calculateSystemBudget));
+
+    // Boot execution loop
+    calculateSystemBudget();
+    draw();
+</script>
+
+</body>
+</html>
