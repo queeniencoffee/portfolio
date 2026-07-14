@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 02 — UAV-to-Ship Link Budget Simulation — Project Prompt</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#ff6b35;--accent2:#00d4ff;--accent3:#00ff9d;--text:#c8dde8;--muted:#4a6a80; }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh; }
+  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(255,107,53,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
+  nav { position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:20px 40px;border-bottom:1px solid var(--border); }
+  .nav-back { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);text-decoration:none;letter-spacing:0.15em;transition:opacity 0.2s; }
+  .nav-back:hover { opacity:0.7; }
+  .nav-divider { color:var(--border); }
+  .nav-label { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em; }
+  .hero { position:relative;z-index:10;padding:60px 40px 40px;max-width:960px;margin:0 auto; }
+  .project-badge { font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:14px; }
+  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,5vw,2.8rem);font-weight:900;letter-spacing:0.03em;line-height:1.15;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,#ffcc80 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
+  .hero-meta { display:flex;flex-wrap:wrap;gap:16px; }
+  .meta-chip { font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:5px 12px;border:1px solid var(--border);border-radius:2px;color:var(--muted);letter-spacing:0.12em; }
+  .meta-chip.accent { border-color:var(--accent);color:var(--accent); }
+  .section-divider { height:1px;background:linear-gradient(90deg,var(--accent),#ffcc80,transparent);max-width:960px;margin:40px auto;position:relative;z-index:10; }
+  .content { position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 40px 80px;display:flex;flex-direction:column;gap:48px; }
+  .section-label { font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px; }
+  .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
+  h2 { font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.03em; }
+  h3 { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:var(--accent2);margin:20px 0 10px;letter-spacing:0.03em; }
+  p { font-size:1rem;line-height:1.8;color:var(--text);font-weight:300;margin-bottom:12px; }
+  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:12px; }
+  ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
+  ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
+  ul.sub li::before { content:'–';color:var(--muted); }
+  table { width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:16px; }
+  th, td { border:1px solid var(--border);padding:8px 10px;text-align:left;color:var(--text); }
+  th { background:var(--card);color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;font-size:0.62rem; }
+  td.num { text-align:right;color:#ffcc80; }
+  tr.highlight td { color:#fff;font-weight:700;background:rgba(255,107,53,0.08); }
+  .table-wrap { overflow-x:auto; }
+  .note { font-size:0.85rem;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:14px;margin-bottom:12px; }
+  @media (max-width:600px) { nav { padding:16px 20px; } .hero { padding:40px 20px 30px; } .content { padding:0 20px 60px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="index.html">← BACK</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-label">PROJECT_02 · PROJECT PROMPT</span>
+</nav>
+
+<div class="hero">
+  <div class="project-badge">// PROJECT_02 &nbsp;&nbsp; CUSTOMER SPECIFICATION</div>
+  <h1>Project Prompt: UAS Avionics, Autonomy, and Datalink Analysis</h1>
+  <div class="hero-meta">
+    <span class="meta-chip accent">SMEM UAS</span>
+    <span class="meta-chip">LCS-2 Class Ship</span>
+    <span class="meta-chip">ISR Mission</span>
+    <span class="meta-chip">DO-362 L-Band</span>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="content">
+
+  <section>
+    <div class="section-label">01 &nbsp; Overview</div>
+    <h2>Assignment Scope</h2>
+    <p>The team is asked to develop requirements and preliminary analysis for a UAS known as SMEM (Strategically-Managed Exploration Module), intended for future Intelligence, Surveillance, and Reconnaissance (ISR) deployment from a Littoral Combat Ship 2 (LCS-2) class ship in waters surrounding Southeast Asia. The scoped area of analysis for this assignment is the <strong>link budget</strong>, based on given system requirements and known receiver characteristics.</p>
+  </section>
+
+  <section>
+    <div class="section-label">02 &nbsp; Mission</div>
+    <h2>SMEM Mission Profile</h2>
+    <p>SMEM shall take off from an LCS-2 class ship to perform ISR data collection over land and sea, with an effective operating radius of 600 nautical miles (NM) and a mission altitude of 10,000–25,000 ft MSL. The mission profile proceeds:</p>
+    <ul>
+      <li>Launch: deployment from the LCS-2 ship via direct RF LOS command and control.</li>
+      <li>Climb-out to a cruising altitude between 10,000 and 25,000 ft.</li>
+      <li>Transit to the ISR mission site.</li>
+      <li>Mission loiter (ISR data collection).</li>
+      <li>Transit back to the LCS-2 ship.</li>
+      <li>Descent / approach.</li>
+      <li>Recovery on the LCS-2 ship using a combination of arresting cable and net (precision approach).</li>
+    </ul>
+    <p>RF LOS communication is maintained during takeoff, climb-out, descent/approach, and recovery, and serves as the primary link whenever the aircraft is within range of a receiver (the launch ship or another suitably equipped LCS-2 ship). RF BLOS communication serves as the redundant command-and-control link during transit to/from the ISR area and throughout the mission loiter, during which the system may be operated under limited pilot control or automation.</p>
+    <p>Recovery is automated to support the precision approach required to account for winds aloft, though a pilot can manually control the UAS for launch/recovery via the RF LOS datalink under extreme conditions. Given the security priority of the system, an alternative landing site (if available) is transmitted to SMEM at least once every 10 minutes whenever a positive command-and-control link is established; if no suitable landing site is reachable due to a system failure, a flight termination system destroys the vehicle. A triplex avionics architecture is required for all major avionics systems, excluding communications, which fall under their own subsystem architecture.</p>
+  </section>
+
+  <section>
+    <div class="section-label">03 &nbsp; Development of Requirements</div>
+    <h2>Scope &amp; Constraints</h2>
+    <p>Requirements and additional analysis must be drawn from the mission description above as well as system needs described in the assigned reading, supplemented by online research as needed. This is a preliminary requirements document — additional details regarding the airframe, flight controls, and propulsion are unknown at this stage, so overly detailed requirements (e.g., sensor update rates) are out of scope.</p>
+    <h3>3.1 Communication</h3>
+    <p>All requirements must be defined from the mission requirement above, with additional requirements added as needed to fully describe the system as a whole. The link budget analysis below provides some of these requirements directly, including the antenna gain.</p>
+  </section>
+
+  <section>
+    <div class="section-label">04 &nbsp; Link Budget Analysis Task</div>
+    <h2>Assignment: Derive the Minimum Antenna Gain</h2>
+    <p>The team is tasked with generating a link budget spreadsheet for the L-Band RF LOS datalink between the control station and the UAS. The current unknown is the <strong>minimum antenna gain</strong> necessary to achieve a net signal margin of at least 31.5 dB — accounting for unaccounted losses such as multipath — at a range of 10 nautical miles.</p>
+    <p>Since the UAS radio and ground radio have symmetric configurations (identical Tx power and required SNR), only the downlink path needs to be modeled. The BLOS datalink is explicitly out of scope for this project.</p>
+
+    <h3>Given Parameters</h3>
+    <p>The datalink is based on the DO-362 standard for an L-Band datalink operating at 1060.5 MHz, assuming worst-case demand of a 138 kbits/s modulation rate across a 120 kHz channel. Both transmitter and receiver specify a Tx power of 15 dBm and a minimum Eb/No of 3.5 dB.</p>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th colspan="2">Signal Properties</th></tr>
+      <tr><td>Frequency, f</td><td class="num">1060.5 MHz</td></tr>
+      <tr><td>Modulation Data Rate, R_Data</td><td class="num">138,000 bit/s</td></tr>
+      <tr><td>Ideal Receiver Bandwidth, B</td><td class="num">120 kHz</td></tr>
+      <tr><td>Spread spectrum</td><td class="num">None</td></tr>
+    </table>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th colspan="2">UAS Communication Hardware</th></tr>
+      <tr><td>Tx Power</td><td class="num">15 dBm</td></tr>
+      <tr><td>Antenna type</td><td class="num">Omnidirectional, vertically polarized</td></tr>
+      <tr><td>Pointing loss</td><td class="num">0 dB</td></tr>
+      <tr><td>Line loss</td><td class="num">1 dB</td></tr>
+      <tr><td>Radome loss</td><td class="num">1 dB</td></tr>
+      <tr><td>Antenna gain</td><td class="num">TBD (solve for this)</td></tr>
+      <tr><td>Rx Eb/No</td><td class="num">3.5 dB</td></tr>
+      <tr><td>Rx Noise Figure</td><td class="num">4 dB</td></tr>
+      <tr><td>Rx antenna polarization loss (assumed)</td><td class="num">3 dB</td></tr>
+    </table>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th colspan="2">Control Station Communication Hardware</th></tr>
+      <tr><td>Tx Power</td><td class="num">15 dBm</td></tr>
+      <tr><td>Antenna gain</td><td class="num">19 dBi (dish, directional, circularly polarized)</td></tr>
+      <tr><td>Line loss</td><td class="num">1 dB</td></tr>
+      <tr><td>Pointing loss</td><td class="num">0 dB</td></tr>
+      <tr><td>Rx Eb/No</td><td class="num">3.5 dB</td></tr>
+      <tr><td>Rx Noise Figure</td><td class="num">4 dB</td></tr>
+      <tr><td>Rx antenna polarization loss (assumed)</td><td class="num">3 dB</td></tr>
+      <tr><td>Radome</td><td class="num">None</td></tr>
+    </table>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th colspan="2">Environment &amp; Target Margin</th></tr>
+      <tr><td>Range</td><td class="num">10 nautical miles</td></tr>
+      <tr><td>Atmospheric loss (est.)</td><td class="num">0.926 dB</td></tr>
+      <tr><td>Precipitation loss (est.)</td><td class="num">0.02 dB</td></tr>
+      <tr class="highlight"><td>Target Signal Margin</td><td class="num">31.5 dB</td></tr>
+    </table>
+    </div>
+
+    <h3>Reporting Requirements</h3>
+    <p>The final report must present the full link budget with the derived UAS antenna gain clearly labeled, state the required antenna gain explicitly, and document any further assumptions or external references used in the analysis.</p>
+    <div class="note">See the companion Report for the full link budget analysis, EIRP derivation, hardware selection, and MATLAB RF coverage validation produced against this prompt.</div>
+  </section>
+
+</div>
+</body>
+</html>

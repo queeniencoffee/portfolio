@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project 02 — Delta-V Calculator</title>
+<title>Project 02 — UAV-to-Ship Link Budget Simulation — Report</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#ff6b35;--accent2:#00d4ff;--accent3:#00ff9d;--text:#c8dde8;--muted:#4a6a80; }
@@ -17,31 +17,33 @@
   .nav-label { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em; }
   .hero { position:relative;z-index:10;padding:60px 40px 40px;max-width:960px;margin:0 auto; }
   .project-badge { font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:14px; }
-  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3.2rem);font-weight:900;letter-spacing:0.06em;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,#ffcc80 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
+  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,5vw,2.8rem);font-weight:900;letter-spacing:0.03em;line-height:1.15;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,#ffcc80 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
   .hero-meta { display:flex;flex-wrap:wrap;gap:16px; }
   .meta-chip { font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:5px 12px;border:1px solid var(--border);border-radius:2px;color:var(--muted);letter-spacing:0.12em; }
   .meta-chip.accent { border-color:var(--accent);color:var(--accent); }
+  .byline { font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--muted);letter-spacing:0.1em;margin-top:16px; }
   .section-divider { height:1px;background:linear-gradient(90deg,var(--accent),#ffcc80,transparent);max-width:960px;margin:40px auto;position:relative;z-index:10; }
   .content { position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 40px 80px;display:flex;flex-direction:column;gap:48px; }
   .section-label { font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px; }
   .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
-  h2 { font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.04em; }
+  h2 { font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.03em; }
+  h3 { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:var(--accent2);margin:20px 0 10px;letter-spacing:0.03em; }
   p { font-size:1rem;line-height:1.8;color:var(--text);font-weight:300;margin-bottom:12px; }
-  .tool-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px; }
-  .tool-card { background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:6px; }
-  .tool-card .t-icon { font-size:1.4rem; }
-  .tool-card .t-name { font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;color:var(--accent);letter-spacing:0.05em; }
-  .tool-card .t-desc { font-size:0.82rem;color:var(--muted);line-height:1.4; }
-  pre { background:#040c14;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;padding:24px;overflow-x:auto;font-family:'Share Tech Mono',monospace;font-size:0.82rem;line-height:1.8;color:#8be0f7; }
-  .kw { color:var(--accent3); } .cm { color:var(--muted);font-style:italic; } .st { color:#ffcc80; } .fn { color:var(--accent2); } .nm { color:#ffab91; }
-  .result-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px; }
+  .formula-box { background:#040c14;border:1px solid var(--border);border-left:3px solid #ffcc80;border-radius:3px;padding:20px 24px;font-family:'Share Tech Mono',monospace;font-size:0.88rem;color:#ffcc80;line-height:2;margin-bottom:14px; }
+  .result-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px; }
   .result-card { background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:3px;padding:20px; }
-  .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
-  .result-card .r-label { font-size:0.82rem;color:var(--muted);letter-spacing:0.08em; }
-  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px; }
+  .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
+  .result-card .r-label { font-size:0.78rem;color:var(--muted);letter-spacing:0.04em; }
+  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:12px; }
   ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
   ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
-  .formula-box { background:#040c14;border:1px solid var(--border);border-left:3px solid #ffcc80;border-radius:3px;padding:20px 24px;font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:#ffcc80;line-height:2; }
+  table { width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:16px; }
+  th, td { border:1px solid var(--border);padding:8px 10px;text-align:left;color:var(--text); }
+  th { background:var(--card);color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;font-size:0.62rem; }
+  td.num { text-align:right;color:#ffcc80; }
+  tr.total td { color:#fff;font-weight:700;background:rgba(255,107,53,0.06); }
+  .table-wrap { overflow-x:auto; }
+  .note { font-size:0.85rem;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:14px;margin-bottom:12px; }
   @media (max-width:600px) { nav { padding:16px 20px; } .hero { padding:40px 20px 30px; } .content { padding:0 20px 60px; } }
 </style>
 </head>
@@ -50,19 +52,20 @@
 <nav>
   <a class="nav-back" href="index.html">← BACK</a>
   <span class="nav-divider">/</span>
-  <span class="nav-label">PROJECT_02 · DELTA-V CALCULATOR</span>
+  <span class="nav-label">PROJECT_02 · UAV-TO-SHIP LINK BUDGET SIMULATION</span>
 </nav>
 
 <div class="hero">
-  <div class="project-badge">// PROJECT_02 &nbsp;&nbsp; ORBITAL MECHANICS</div>
-  <h1>Delta-V Calculator</h1>
+  <div class="project-badge">// PROJECT_02 &nbsp;&nbsp; RF COMMUNICATIONS · LINK BUDGET DESIGN</div>
+  <h1>High-Level Conceptual Design of RF Communication System at South China Sea</h1>
   <div class="hero-meta">
-    <span class="meta-chip accent">Astrodynamics</span>
-    <span class="meta-chip">Python</span>
-    <span class="meta-chip">NumPy</span>
-    <span class="meta-chip">SciPy</span>
-    <span class="meta-chip">Hohmann Transfer</span>
+    <span class="meta-chip accent">L-Band RF LOS</span>
+    <span class="meta-chip">DO-362</span>
+    <span class="meta-chip">Link Budget</span>
+    <span class="meta-chip">EIRP / Antenna Gain</span>
+    <span class="meta-chip">MATLAB RF Coverage</span>
   </div>
+  <div class="byline">Sally Law · Embry-Riddle Aeronautical University · July 5, 2026</div>
 </div>
 
 <div class="section-divider"></div>
@@ -70,168 +73,111 @@
 <div class="content">
 
   <section>
-    <div class="section-label">01 &nbsp; Description</div>
-    <h2>Project Overview</h2>
-    <p>The Delta-V Calculator is a Python-based orbital mechanics tool for computing the propulsive budget required to execute interplanetary and Earth-orbital transfers. Starting from Keplerian orbital elements, the tool calculates the total Δv for common maneuver sequences including Hohmann transfers, bi-elliptic transfers, plane changes, and gravity-assist flyby sequences.</p>
-    <p>The calculator supports both circular and elliptical departure/arrival orbits and accounts for the Oberth effect when burns occur inside gravity wells. Users can define multi-body mission profiles (e.g., Earth → Mars → asteroid) and receive a full Δv budget breakdown with recommended burn epoch windows.</p>
-    <p>Built primarily with NumPy and SciPy, it uses the vis-viva equation as its foundation and integrates Lambert's problem solver for arbitrary transfer arcs.</p>
-
-    <div class="formula-box">
-      <div>// Key equations</div>
-      <div>Δv = √(μ/r₁) × (√(2r₂/(r₁+r₂)) − 1) &nbsp; [Hohmann departure burn]</div>
-      <div>Δv = √(μ/r₂) × (1 − √(2r₁/(r₁+r₂))) &nbsp; [Hohmann arrival burn]</div>
-      <div>v² = μ × (2/r − 1/a) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Vis-viva equation]</div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-label">02 &nbsp; Required Tools &amp; Technologies</div>
-    <div class="tool-grid">
-      <div class="tool-card">
-        <div class="t-icon">🐍</div>
-        <div class="t-name">Python 3.10+</div>
-        <div class="t-desc">Core computation engine</div>
-      </div>
-      <div class="tool-card">
-        <div class="t-icon">🔢</div>
-        <div class="t-name">NumPy</div>
-        <div class="t-desc">Vector math and orbital element transforms</div>
-      </div>
-      <div class="tool-card">
-        <div class="t-icon">🧮</div>
-        <div class="t-name">SciPy</div>
-        <div class="t-desc">Lambert solver (root-finding) and optimization</div>
-      </div>
-      <div class="tool-card">
-        <div class="t-icon">📊</div>
-        <div class="t-name">Matplotlib</div>
-        <div class="t-desc">Porkchop plot and Δv contour visualization</div>
-      </div>
-      <div class="tool-card">
-        <div class="t-icon">🌌</div>
-        <div class="t-name">Poliastro</div>
-        <div class="t-desc">Reference library for validation of maneuver results</div>
-      </div>
-      <div class="tool-card">
-        <div class="t-icon">📋</div>
-        <div class="t-name">Pandas</div>
-        <div class="t-desc">Δv budget table export and mission profile storage</div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-label">03 &nbsp; Code / Implementation</div>
-    <h2>Hohmann Transfer Solver</h2>
-    <p>The core module computes departure and arrival Δv for a Hohmann transfer between two circular orbits in the same plane around a central body.</p>
-<pre>
-<span class="cm"># delta_v.py — orbital transfer calculator</span>
-<span class="kw">import</span> numpy <span class="kw">as</span> np
-<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
-
-<span class="cm"># Gravitational parameters (km³/s²)</span>
-MU = {
-    <span class="st">"Sun"</span>  : <span class="nm">1.327124e11</span>,
-    <span class="st">"Earth"</span>: <span class="nm">3.986004e5</span>,
-    <span class="st">"Mars"</span> : <span class="nm">4.28282e4</span>,
-}
-
-<span class="fn">@dataclass</span>
-<span class="kw">class</span> <span class="nm">HohmannResult</span>:
-    dv1      : float   <span class="cm"># Departure burn (km/s)</span>
-    dv2      : float   <span class="cm"># Arrival burn  (km/s)</span>
-    dv_total : float   <span class="cm"># Total budget  (km/s)</span>
-    tof      : float   <span class="cm"># Transfer time (days)</span>
-
-<span class="fn">def</span> <span class="nm">hohmann</span>(r1: float, r2: float, body=<span class="st">"Earth"</span>) -> <span class="nm">HohmannResult</span>:
-    <span class="cm">"""
-    Compute Hohmann transfer Δv between two circular orbits.
-    r1, r2: radii in km from body centre.
-    """</span>
-    mu = MU[body]
-    a_transfer = (r1 + r2) / <span class="nm">2</span>           <span class="cm"># Semi-major axis of transfer ellipse</span>
-
-    v_circ1 = np.sqrt(mu / r1)            <span class="cm"># Circular velocity at r1</span>
-    v_circ2 = np.sqrt(mu / r2)            <span class="cm"># Circular velocity at r2</span>
-    v_per   = np.sqrt(mu * (<span class="nm">2</span>/r1 - <span class="nm">1</span>/a_transfer))  <span class="cm"># Speed at periapsis</span>
-    v_apo   = np.sqrt(mu * (<span class="nm">2</span>/r2 - <span class="nm">1</span>/a_transfer))  <span class="cm"># Speed at apoapsis</span>
-
-    dv1 = v_per - v_circ1
-    dv2 = v_circ2 - v_apo
-    tof = np.pi * np.sqrt(a_transfer**<span class="nm">3</span> / mu) / <span class="nm">86400</span>  <span class="cm"># seconds → days</span>
-
-    <span class="kw">return</span> HohmannResult(
-        dv1=<span class="fn">round</span>(dv1, <span class="nm">4</span>),
-        dv2=<span class="fn">round</span>(dv2, <span class="nm">4</span>),
-        dv_total=<span class="fn">round</span>(dv1 + dv2, <span class="nm">4</span>),
-        tof=<span class="fn">round</span>(tof, <span class="nm">2</span>)
-    )
-
-<span class="cm"># ── Example: LEO → GEO ───────────────────────────────────────</span>
-r_LEO = <span class="nm">6371</span> + <span class="nm">400</span>   <span class="cm"># km (400 km altitude)</span>
-r_GEO = <span class="nm">42164</span>         <span class="cm"># km</span>
-result = hohmann(r_LEO, r_GEO, body=<span class="st">"Earth"</span>)
-<span class="fn">print</span>(<span class="st">f"ΔV₁ = {result.dv1} km/s"</span>)
-<span class="fn">print</span>(<span class="st">f"ΔV₂ = {result.dv2} km/s"</span>)
-<span class="fn">print</span>(<span class="st">f"Total = {result.dv_total} km/s | TOF = {result.tof} days"</span>)
-</pre>
-
-    <h2 style="margin-top:28px;">Porkchop Plot Generator</h2>
-<pre>
-<span class="fn">def</span> <span class="nm">porkchop_plot</span>(body1=<span class="st">"Earth"</span>, body2=<span class="st">"Mars"</span>,
-                   launch_window=<span class="nm">365</span>, tof_range=(<span class="nm">100</span>, <span class="nm">400</span>)):
-    <span class="cm">"""Generate C3 and arrival Δv contours for launch window analysis."""</span>
-    <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
-    <span class="kw">from</span> scipy.optimize <span class="kw">import</span> brentq
-
-    launch_days = np.arange(<span class="nm">0</span>, launch_window)
-    tof_days    = np.arange(*tof_range)
-    dv_grid     = np.zeros((len(tof_days), len(launch_days)))
-
-    <span class="kw">for</span> i, ld <span class="kw">in</span> enumerate(launch_days):
-        <span class="kw">for</span> j, tof <span class="kw">in</span> enumerate(tof_days):
-            dv_grid[j, i] = lambert_dv(body1, body2, ld, tof)
-
-    plt.figure(figsize=(<span class="nm">12</span>, <span class="nm">8</span>), facecolor=<span class="st">"#050a10"</span>)
-    cp = plt.contourf(launch_days, tof_days, dv_grid,
-                      levels=<span class="nm">25</span>, cmap=<span class="st">"inferno"</span>)
-    plt.colorbar(cp, label=<span class="st">"Total Δv (km/s)"</span>)
-    plt.title(<span class="st">f"Porkchop Plot: {body1} → {body2}"</span>, color=<span class="st">"#00d4ff"</span>)
-    plt.xlabel(<span class="st">"Launch Day"</span>); plt.ylabel(<span class="st">"Time of Flight (days)"</span>)
-    plt.tight_layout()
-    plt.savefig(<span class="st">"porkchop.png"</span>, dpi=<span class="nm">150</span>)
-</pre>
-  </section>
-
-  <section>
-    <div class="section-label">04 &nbsp; Results</div>
-    <div class="result-grid">
-      <div class="result-card">
-        <div class="r-val">3.93</div>
-        <div class="r-label">km/s — LEO→GEO total Δv (matches textbook)</div>
-      </div>
-      <div class="result-card">
-        <div class="r-val">&lt;0.1%</div>
-        <div class="r-label">Error vs. Poliastro reference results</div>
-      </div>
-      <div class="result-card">
-        <div class="r-val">7 types</div>
-        <div class="r-label">Transfer maneuvers supported</div>
-      </div>
-      <div class="result-card">
-        <div class="r-val">3D plot</div>
-        <div class="r-label">Earth–Mars porkchop plot generated</div>
-      </div>
-    </div>
-    <br>
-    <h2>Key Outcomes</h2>
+    <div class="section-label">01 &nbsp; Introduction</div>
+    <h2>RF Communications in a Contested Theater</h2>
+    <p>The South China Sea is one of the world's most contested waterways, where regional state actors use "salami-slicing" and "cabbage tactics" to assert dominance within the electromagnetic spectrum rather than through direct kinetic conflict. Any UAV RF communication system operating in this environment must account for RF interference, tactical datalink interception, and a baseline link budget robust enough to withstand environmental degradation while guaranteeing a sufficient fade margin.</p>
+    <p>Because standard ITU databases do not always reflect the reality of a contested grey zone, the design also leans on Open-Source Intelligence (OSINT) and geopolitical risk monitoring ahead of deployment. The system's intended L-Band radio operates at 1060.5 MHz — a frequency sensitive to the tropical maritime boundary layer of the South China Sea — so the link budget dynamically accounts for two environmental constraints scoped for this project:</p>
     <ul>
-      <li>LEO→GEO Hohmann Δv of 3.928 km/s validated against Fundamentals of Astrodynamics (Bate, Mueller, White).</li>
-      <li>Earth→Mars porkchop plot reproduced 2022 launch window minimum-Δv corridor within 2% of published NASA data.</li>
-      <li>Bi-elliptic transfer correctly identified as more efficient than Hohmann when r₂/r₁ exceeds 11.94.</li>
-      <li>Gravity-assist Δv savings modeled for Venus flyby on Earth–Jupiter trajectory.</li>
-      <li>Rocket equation integration confirmed payload mass fractions for given Isp and Δv budgets.</li>
+      <li><strong>Rain &amp; Moisture Absorption</strong> — heavy tropical downpours and high absolute humidity cause localized signal attenuation and hydrometeor scattering.</li>
+      <li><strong>Ionospheric Turbulence</strong> — solar activity and ionospheric scintillation can induce rapid phase and amplitude fluctuations that degrade signal coherence.</li>
     </ul>
+    <p>Frequency validation cross-referenced 1060.5 MHz against the ITU Region 3 allocation table, confirming the band is reserved for Aeronautical Radionavigation Service (ARNS) — a low civilian-interference profile on paper. In practice, the Nine-Dash Line dispute means regional actors reject international spectrum zoning across roughly 90% of the theater, so physical spectrum usage is governed by de facto military enforcement rather than de jure law. Operating at 1060.5 MHz also sits close to the 1030/1090 MHz IFF and Secondary Surveillance Radar bands used by the PLAN, US Navy, and regional coastal forces — so the system must be rigorously filtered for spectral containment to avoid bleeding into those guard bands.</p>
+  </section>
+
+  <section>
+    <div class="section-label">02 &nbsp; Mission Profile &amp; Navigation Plan</div>
+    <h2>SMEM UAV Operating from an LCS-2 Ship</h2>
+    <p>Line-of-Sight (LOS) communications serve as the primary link during launch, climb-out, descent, and recovery, and remain an active redundant backup whenever the aircraft is within physical range of a suitably equipped ship. For long-range operations, Beyond Line-of-Sight (BLOS) communication is the primary command-and-control link through transit and mission loiter. Because the LCS-2 has a wide trimaran flight deck rather than a longitudinal runway, a VTOL configuration was selected for the navigation plan.</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Waypoint</th><th>Phase</th><th>Altitude (MSL)</th><th>Distance from Ship</th><th>Link</th></tr>
+      <tr><td>WP-1A</td><td>Launch / Origin</td><td class="num">Sea Level</td><td class="num">0 NM</td><td>RF LOS C2 (BLOS available)</td></tr>
+      <tr><td>WP-1B</td><td>Top of Vertical Climb</td><td class="num">24,000 ft</td><td class="num">0 NM (over ship)</td><td>RF LOS C2, BLOS redundant</td></tr>
+      <tr><td>WP-2</td><td>Loiter Station (AOI)</td><td class="num">24,000 ft</td><td class="num">10.0 NM south</td><td>RF LOS maintained</td></tr>
+      <tr><td>WP-3A</td><td>Inbound Return</td><td class="num">24,000 ft</td><td class="num">0 NM (over ship)</td><td>RF LOS maintained</td></tr>
+      <tr><td>WP-3B</td><td>Vertical Descent / End of Flight</td><td class="num">Sea Level</td><td class="num">0 NM</td><td>RF LOS C2, BLOS available</td></tr>
+    </table>
+    </div>
+    <p>Geometric LOS and Fresnel Zone clearance were validated in MATLAB using Earthstar Geographics terrain datasets across the 10 NM waypoint profile. With the UAV cruising at 24,000 ft, the maximum 28.3-meter Fresnel radius remains thousands of feet above the sea surface, eliminating multipath encroachment risk, and the RF horizon at this altitude extends past 130 NM — well beyond the 10 NM operational range — so Earth curvature is not a factor in this short-range mission.</p>
+  </section>
+
+  <section>
+    <div class="section-label">03 &nbsp; Link Budget Design (RF LOS)</div>
+    <h2>Signal Link Margin</h2>
+    <p>Net signal margin is the safety buffer between the actual received signal and the minimum power the receiver needs to hold a reliable connection:</p>
+    <div class="formula-box">
+      <div>Net signal margin (dB) = Available SNR (dB) − Required SNR (dB)</div>
+      <div>Required SNR (dB) = Eb/No + Data Rate (dBHz) − Bandwidth (dBHz)</div>
+    </div>
+    <p>With a 138 kbps modulation rate across a 120 kHz channel and Eb/No of 3.5 dB, the Required SNR resolves to 4.11 dB. Against the mission's target Net Signal Margin of 31.5 dB, the link must therefore deliver a minimum Available SNR of 35.61 dB.</p>
+
+    <h3>Effective Noise Power (N₀)</h3>
+    <div class="formula-box">
+      <div>Effective Noise Power (dBm) = Thermal Noise Density (kT) + Rx Bandwidth (10·log₁₀B) + Noise Figure (NF)</div>
+      <div>= −174 dBm/Hz + 50.79 dBHz + 4 dB = <strong>−119.21 dBm</strong></div>
+    </div>
+
+    <h3>Link Budget Losses</h3>
+    <p>Free Space Path Loss (FSPL) was computed from the true slant range at a worst-case 25,000 ft UAV altitude over a 10 NM ground distance (slant range = 20.028 km):</p>
+    <div class="formula-box">
+      <div>FSPL(dB) = 20·log₁₀(d) + 20·log₁₀(f) + 20·log₁₀(4π/c) = <strong>118.31 dB</strong></div>
+    </div>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Loss Source</th><th>Value</th></tr>
+      <tr><td>Free space path loss</td><td class="num">−118.31 dB</td></tr>
+      <tr><td>Atmospheric absorption</td><td class="num">−0.93 dB</td></tr>
+      <tr><td>Precipitation absorption</td><td class="num">−0.02 dB</td></tr>
+      <tr class="total"><td>Total propagation loss</td><td class="num">−119.26 dB</td></tr>
+    </table>
+    </div>
+
+    <h3>EIRP &amp; Minimum Antenna Gain</h3>
+    <p>Working backward from the minimum Effective Carrier Power (−83.60 dBm) through the LCS-2 receiver chain (19 dBi antenna gain, −3 dB polarization loss, −1 dB line loss) and the total propagation loss yields a minimum required EIRP of 20.66 dBm — and, at 15 dBm transmit power with 1 dB of line/radome loss, a minimum UAV transmitter antenna gain of <strong>7.66 dBi</strong>.</p>
+    <p>Because no real antenna reaches 100% efficiency, the required base gain was adjusted across a range of efficiency ratings. An 80%-efficient antenna was selected, driving the designed base gain up to 12.124 dBi to guarantee the 7.66 dBi realized minimum.</p>
+  </section>
+
+  <section>
+    <div class="section-label">04 &nbsp; Requirements Allocation &amp; Hardware Prediction</div>
+    <h2>From Baseline Margin to Selected Hardware</h2>
+    <p>An additional margin was allocated to absorb unforeseen RF losses, raising the design target from the 31.5 dB baseline to a 35.0 dB requirements allocation, and finally to a 37.40 dB predicted margin once real hardware (13.155 dBi realized antenna gain) was selected.</p>
+    <div class="result-grid">
+      <div class="result-card"><div class="r-val">31.50 dB</div><div class="r-label">Baseline required margin</div></div>
+      <div class="result-card"><div class="r-val">35.00 dB</div><div class="r-label">Requirements allocation</div></div>
+      <div class="result-card"><div class="r-val">37.40 dB</div><div class="r-label">Hardware prediction (achieved)</div></div>
+      <div class="result-card"><div class="r-val">+2.40 dB</div><div class="r-label">Margin above allocation</div></div>
+    </div>
+
+    <h3>Final Link Budget Summary</h3>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Tx Power (Ptx)</td><td class="num">15.00 dBm</td></tr>
+      <tr><td>Tx antenna gain (Gt, realized)</td><td class="num">13.16 dBi</td></tr>
+      <tr><td>EIRP</td><td class="num">26.56 dBm</td></tr>
+      <tr><td>Total propagation loss</td><td class="num">−119.26 dB</td></tr>
+      <tr><td>Rx antenna gain (G_R)</td><td class="num">19.00 dBi</td></tr>
+      <tr><td>Effective carrier power</td><td class="num">−77.70 dBm</td></tr>
+      <tr><td>Effective noise power</td><td class="num">−119.21 dBm</td></tr>
+      <tr><td>Available SNR</td><td class="num">41.51 dB</td></tr>
+      <tr><td>Required SNR</td><td class="num">4.11 dB</td></tr>
+      <tr class="total"><td>Net signal margin</td><td class="num">37.40 dB</td></tr>
+    </table>
+    </div>
+
+    <h3>Hardware Selection</h3>
+    <ul>
+      <li><strong>Airborne:</strong> 15.0 dBm L-Band transmitter (GMSK), 0.5 W / 80%-efficient power amplifier, 13.155 dBi omnidirectional dipole antenna, low-loss LMR-400 coax.</li>
+      <li><strong>LCS-2 Ground Station:</strong> 19.0 dBi parabolic dish (18° beamwidth), 2-axis gimbal with ±45° elevation / 360° azimuth tracking, ≤4.0 dB noise figure LNA, GMSK demodulator rated for 138 kbps at ≤1×10⁻⁶ BER.</li>
+    </ul>
+    <p>A MATLAB RF coverage analysis, run against the finalized hardware and NavPlan waypoints with rain attenuation and environmental losses included, confirmed a robust RF link throughout the operational footprint between the LCS-2 ship and the mission loiter station.</p>
+  </section>
+
+  <section>
+    <div class="section-label">05 &nbsp; Conclusion</div>
+    <h2>Design Verification</h2>
+    <p>The UAV communication system design was validated against all derived requirements for VTOL-based ISR operations from an LCS-2 ship in the South China Sea, achieving a net signal margin of 37.40 dB against the 35.0 dB requirement. The dual-link architecture — LOS primary with BLOS backup — ensures continuous command and control across all mission phases, with BER (≤1×10⁻⁶), EIRP (26.56 dBm), and receiver noise figure (4.0 dB) all meeting or exceeding their specified thresholds.</p>
+    <div class="note">Full requirements traceability (UAV-1 through UAV-3), communication subsystem specification (CM-1 through CM-10), and design verification status are captured in the complete design paper.</div>
   </section>
 
 </div>

@@ -69,7 +69,7 @@ nav {
   align-items: flex-end; gap: 4rem;
   padding: 0 4rem 5rem;
 }
-.hero-text { max-width: 680px; }
+.hero-text { max-width: 1240px; }
 .hero-eyebrow {
   font-family: 'DM Mono', monospace; font-size: 0.68rem;
   letter-spacing: 0.2em; text-transform: uppercase;
@@ -93,7 +93,7 @@ nav {
 }
 .hero-summary {
   font-size: 0.82rem; color: rgba(255,255,255,0.65);
-  line-height: 1.9; max-width: 560px;
+  line-height: 1.9; max-width: 1120px;
   border-left: 2px solid var(--accent); padding-left: 1.2rem;
   margin-bottom: 2rem;
 }
@@ -333,6 +333,10 @@ section { padding: 7rem 4rem; }
   background: rgba(201,75,36,0.07); border: 1px solid rgba(201,75,36,0.25);
   color: var(--accent); letter-spacing: 0.04em;
 }
+.honors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+@media (max-width: 1100px) {
+  .honors-grid { grid-template-columns: 1fr 1fr; }
+}
 
 /* CONTACT */
 #contact {
@@ -392,7 +396,7 @@ footer {
   .hero-content { grid-template-columns: 1fr; padding: 0 1.5rem 3rem; }
   .hero-photo-col { display: flex; justify-content: center; }
   .hero-photo { height: 260px; }
-  .skills-layout, .edu-grid { grid-template-columns: 1fr; }
+  .skills-layout, .edu-grid, .honors-grid { grid-template-columns: 1fr; }
   .stats-bar { flex-wrap: wrap; }
   .stat-item { flex: 1 1 50%; }
 }
@@ -550,19 +554,15 @@ footer {
   <div class="hero-banner"></div>
   <div class="hero-content">
     <div class="hero-text">
-      <span class="hero-eyebrow">// Aerospace · Space Systems · Defense · Electronics Warfare</span>
+      <span class="hero-eyebrow">// Aerospace · Defense · Space Systems · Aircraft & UAV · </span>
       <h1 class="hero-name">Sally Law</em></h1>
       <div class="hero-roles">
         <span class="role-pill">Systems Engineer</span>
         <span class="role-pill">Project Engineer</span>
-        <span class="role-pill">Engineer-in-Training (EIT)</span>
-        <span class="role-pill">EVM Certified</span>
+        <span class="role-pill">EVM & EIT Certified</span>
       </div>
       <p class="hero-summary">
-        Aerospace professional with 10+ years across Raytheon, SAIC, Virgin Orbit,
-        and Northrop Grumman. Specialist in Frontend Product Development, Critical System Design, Verification &amp; Validation,
-        flight-critical power systems, requirements management, and anomaly resolution
-        for space satellites, aircraft & space avionics, and electronic warfare platforms.
+        End-to-End Systems Engineer with 10+ years supporting development programs across space systems, tactical aircraft, and airborne/RF platforms, from requirements definition through Critical Design Review, integration, verification, and customer sell-off. Proven track record as Responsible Systems Engineer (RSE) and Project Engineer on U.S. Space Force and defense acquisition programs, leading requirements management and cross-functional technical integration between prime contractors, subcontractors, and government stakeholders. Skilled in IBM DOORS, MATLAB, and Python for requirements, verification, and data-trending tool development.
       </p>
       <div class="hero-ctas">
         <a href="#experience" class="btn-primary">View Experience</a>
@@ -617,6 +617,27 @@ footer {
     </div>
   </div>
 
+  <div class="cred-inline-block">
+    <div class="cred-inline-label" style="color: white;">Corporate Awards</div>
+    <div class="cred-grid">
+      <div class="cred-card">
+        <span class="cred-icon">&#x1F3D6;&#xFE0F;</span>
+        <div class="cred-title">Northrop Grumman COW Award</div>
+        <div class="cred-sub">Recognizing outstanding individual contribution and engineering excellence</div>
+      </div>
+      <div class="cred-card">
+        <span class="cred-icon">&#x2B50;</span>
+        <div class="cred-title">Raytheon RSTAR Award (x8)</div>
+        <div class="cred-sub">Peer-nominated recognition for outstanding performance and technical impact · Raytheon Intelligence &amp; Space</div>
+      </div>
+      <div class="cred-card">
+        <span class="cred-icon">&#x1F3C5;</span>
+        <div class="cred-title">SAIC Award</div>
+        <div class="cred-sub">Recognizing excellence in FFRDC/SETA systems engineering and technical advisory support</div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <!-- TECH PROJECTS -->
@@ -647,17 +668,22 @@ footer {
     </div>
 
     <div class="proj-card">
+      <a href="project2.html"><img src="img/RFLinkBudget.png" alt="UAV-to-Ship Link Budget Simulation" class="proj-img"/></a>
       <span class="proj-num">Project 02</span>
-      <div class="proj-icon">&#x1F680;</div>
-      <div class="proj-title">Delta-V Calculator</div>
-      <div class="proj-desc">Orbital mechanics tool for computing delta-v budgets across multi-body transfer maneuvers. Supports Hohmann transfers, bi-elliptic trajectories, and plane-change burns with interactive porkchop plot generation.</div>
+      <div class="proj-icon">&#x1F4E1;</div>
+      <div class="proj-title">UAV-to-Ship Link Budget Simulation</div>
+      <div class="proj-desc">RF link budget design and simulation for an L-Band UAV-to-ship command-and-control datalink operating in the contested South China Sea. Derives minimum antenna gain, EIRP, and net signal margin against DO-362 requirements, then validates RF line-of-sight coverage in MATLAB.</div>
       <div class="proj-divider"></div>
       <div class="proj-links">
+        <a class="proj-link proj-link-doc" href="project2-prompt.html" target="_blank">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Project Prompt
+        </a>
         <a class="proj-link proj-link-doc" href="project2.html" target="_blank">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Documentation
+          Report
         </a>
-        <a class="proj-link proj-link-launch" href="delta-v-calculator.html" target="_blank">
+        <a class="proj-link proj-link-launch" href="https://queeniencoffee.github.io/portfolio/ShowCase/RFComm/LinkBudgetSim.html" target="_blank">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Launch App
         </a>
@@ -773,24 +799,12 @@ footer {
 
     <div class="job fade-up">
       <div class="job-meta">
-        <span class="job-company">Embry Riddle Aeronautical University</span>
-        <span class="job-period">April 2026 – Current · Los Angeles, CA</span>
+        <span class="job-company">Embry-Riddle Aeronautical University</span>
+        <span class="job-period">May 2026 – Present · Los Angeles, CA</span>
       </div>
       <div class="job-title">Graduate Study</div>
       <ul class="job-bullets">
-        <li>Graduate Study at Embry Riddle Aeronautical University in Aeronautical and Astronautical engineering.</li>
-      </ul>
-    </div>
-
-    <div class="job fade-up">
-      <div class="job-meta">
-        <span class="job-company">Medical Leave</span>
-        <span class="job-period">April 2025 – March 2026 · Los Angeles, CA and Dulles, VA</span>
-      </div>
-      <div class="job-title"></div>
-      <ul class="job-bullets">
-        <li>Took a planned time-off to manage and recover from serious medical conditions, including rehabilitative care. Fully resolved and ready to return to work.</li>
-        <li>Diagnosed with tumor, ankle fracture and multiple complex adnomial medical issues. </li>
+        <li>Expanding engineering capabilities in aerospace mission design, vehicle-level simulation, and end-to-end mission design validation for complex flight platforms.</li>
       </ul>
     </div>
 
@@ -799,13 +813,10 @@ footer {
         <span class="job-company">SAIC</span>
         <span class="job-period">Dec 2022 – Apr 2025 · El Segundo, CA</span>
       </div>
-      <div class="job-title">Principal Systems Engineer — SETA support to US Space Force</div>
+      <div class="job-title">Principal System Engineer V</div>
       <ul class="job-bullets">
-        <li>Provided FFRDC/SETA support to US Space Force Space Systems Command (USSF/SSC) on Lead Development Test Organization (LDTO) efforts spanning space systems Modeling &amp; Simulation and orbital test planning activities.</li>
-        <li>Developed MATLAB-based tracking and target-location algorithms for EO/IR satellite payloads, improving accuracy and automation of on-orbit analysis workflows.</li>
-        <li>Collaborated directly with military personnel and government stakeholders to assess mission requirements, define system performance criteria, and support test readiness reviews.</li>
-        <li>Supported space systems M&amp;S activities to evaluate satellite mission scenarios and validate orbital test strategies against program requirements.</li>
-        <li>Contributed to technical documentation and reporting to support program milestones and customer deliverables for classified space programs.</li>
+        <li>Provided Federally Funded Research and Development Center / Systems Engineering and Technical Assistance (FFRDC/SETA) systems engineering and technical advisory support to U.S. Space Force Space Systems Command (USSF/SSC) across acquisition planning, program oversight, and technical review of space development programs.</li>
+        <li>Contributed to government technical assessment of contractor systems engineering products, informing program risk identification and acquisition decision-making for space system development efforts.</li>
       </ul>
     </div>
 
@@ -814,14 +825,13 @@ footer {
         <span class="job-company">Virgin Orbit National Systems</span>
         <span class="job-period">Sept 2022 – Dec 2022 · El Segundo, CA</span>
       </div>
-      <div class="job-title">Senior Project Engineer — PMO</div>
+      <div class="job-title">Senior Project Engineer (PMO)</div>
       <ul class="job-bullets">
-        <li>Reported directly to the Senior Director of Operations; contributed to strategic planning, milestone preparation, and program execution for a US Space Force Space Test Program mission.</li>
-        <li>Responded to and resolved customer-issued CURE Notices and Contract Negotiations, sustaining contractual compliance and strengthening customer relationships.</li>
-        <li>Drafted and presented CDR Requirements Section; ensured all CDR entrance/exit criteria and CDRL deliveries were met on schedule.</li>
-        <li>Led systems engineering and requirements development including authoring program-level specifications and the Verification Cross Reference Matrix (VCRM).</li>
-        <li>Facilitated Mission Design Review (MDR) and Critical Design Review (CDR); hosted weekly Customer SEWG meetings with government customers.</li>
-        <li>Acted as primary coordination point between Prime Contractor (VO-NS) and Subcontractor (Virgin Orbit), resolving issues prior to CDR.</li>
+        <li>Served the Program Management Office (PMO) for a U.S. Space Force mission under the Space Test Program (STP), leading systems engineering efforts, managing requirements, and coordinating with subcontractors from Mission Definition Review (MDR) through Critical Design Review (CDR); reported directly to the Senior Director of Operations.</li>
+        <li>Drafted the Program CDR Requirements Section, ensuring design alignment with system-level specifications and on-schedule delivery of all CDR entrance/exit criteria and Contract Data Requirements List (CDRL) items.</li>
+        <li>Hosted weekly Customer Systems Engineering Working Group (SEWG) meetings with U.S. Space Force stakeholders as primary technical integration point between the Prime Contractor and subcontractors.</li>
+        <li>Facilitated MDR/CDR milestone reviews and supported Integrated Master Schedule (IMS) optimization to maintain high-visibility program deliverables.</li>
+        <li>Provided direct support to the Senior Director of Operations on strategic planning, milestone preparation, and resolution of contractual/operational variances to sustain program compliance.</li>
       </ul>
     </div>
 
@@ -830,28 +840,42 @@ footer {
         <span class="job-company">Raytheon Intelligence &amp; Space</span>
         <span class="job-period">Sept 2017 – Aug 2022 · El Segundo, CA</span>
       </div>
-      <div class="job-title">Senior Systems Engineer — Space Systems &amp; Electronic Warfare</div>
+      <div class="job-title">Senior System Engineer</div>
       <ul class="job-bullets">
-        <li>RSE for 6 major units and payload-level; developed requirements management process and new SharePoint tool to streamline sell-off; authored 6 unit specs and 1 space payload spec for CDRL delivery.</li>
-        <li>TPM owner for payload cycle time, data latency, and power budget; authored custom 1553B telemetry format; served as Interface and C&amp;T SME at weekly TIMs.</li>
-        <li>Authored multiple SV-to-Payload Electrical ICDs, Software-Firmware ICDs, and Requirements Allocation Matrices (RAM) covering power, interface, and C&amp;T topics.</li>
-        <li>Led timing architecture trade study and presented at OPIR Polar SDR/SRR; built new power reporting system and cable loss calculator for 14 payload units (OPIR GEO).</li>
-        <li>Authored Thermal &amp; Power Control Algorithm for a front-end development program; analyzed and resolved Airborne Tactical Radar flight data anomalies and briefed root cause to Chief Engineer.</li>
+        <li>Served as Responsible Systems Engineer (RSE), Technical Document Author, system-level representative for power, interface, timing, and command &amp; telemetry topics, and Algorithm Development Owner across both space programs and airborne program, supporting program lifecycle from proposal through system hand-off.</li>
+        <li>Owned requirements development during System Requirements Review/System Design Review (SRR/SDR) for 6 major units and 1 space payload as RSE; created and confirmed the Verification Cross Reference Matrix (VCRM) and managed requirements traceability through customer sell-off.</li>
+        <li>Authored multiple Electrical and Software/Firmware Interface Control Documents (ICDs), 6 unit specifications, and 1 payload specification in support of Contract Data Requirements List (CDRL) deliverables; created system power architecture and hardware interface architecture; drafted the Requirements Allocation Matrix (RAM) for Power, Interface, and Command &amp; Telemetry domains.</li>
+        <li>Served as system-level representative and Technical Performance Measure (TPM) owner for System Power, Interface, Timing, and Command &amp; Telemetry (C&amp;T); led a customer timing architecture trade study and represented the team at weekly Technical Interchange Meetings (TIM).</li>
+        <li>Established a requirements management process and SharePoint-based tool to streamline requirements sell-off and identify engineering gaps across cross-disciplinary teams.</li>
+        <li>Engineered Thermal &amp; Power Control Algorithms in MATLAB/Python for an airborne development program; analyzed flight test data to root-cause Airborne Tactical Radar anomalies and reported findings to the Chief Engineer.</li>
       </ul>
     </div>
 
     <div class="job fade-up">
       <div class="job-meta">
         <span class="job-company">Northrop Grumman</span>
-        <span class="job-period">Apr 2015 – Apr 2017 · Redondo Beach, CA</span>
+        <span class="job-period">Jul 2016 – Apr 2017 · Redondo Beach, CA</span>
       </div>
-      <div class="job-title">Space Systems Engineer I — V&V and F-35 Project Engineer II — PMO</div>
+      <div class="job-title">Fifth-Generation Fighter Project Engineer II (PMO)</div>
       <ul class="job-bullets">
-        <li>F-35 LRIP: Analyzed aircraft-level requirements, developed traceability packages using DOORS/ICDs; coordinated across El Segundo, Redondo Beach, and Palmdale facilities for ECR impact assessments.</li>
-        <li>Presented cost, schedule, and technical impacts at Program Review Board; provided integrated business and technical proposal support leading to successful contract awards.</li>
-        <li>Utilized SAP SCM to identify affected parts; developed a quick-screening methodology that accelerated supply chain impact assessment by 40%.</li>
-        <li>Space V&amp;V: Built Python/MATLAB validation tools — 2D/3D antenna roll-off validator, scan-loss tool, link budget calculators (G/T, EIRP, PIL, RRIP), noise temperature tool, C&amp;T Cal-Curve tool.</li>
-        <li>Performed real-time requirements sell-off during 24-hour thermal cycle tests; identified and resolved Phase Noise OOS and thermistor OOL anomalies; presented findings at Test Data Review.</li>
+        <li>Served as Proposal, Requirements Change, and Supply Chain Management Engineer on a Fifth-Generation Fighter aircraft Low-Rate Initial Production (LRIP) program, supporting cross-functional teams across El Segundo, Redondo Beach, and Palmdale facilities.</li>
+        <li>Analyzed aircraft-level requirements and built traceability packages using IBM DOORS, ICDs, and engineering specifications; validated work quality following Customer Engineering Change Requests (ECRs).</li>
+        <li>Briefed cost, schedule, and technical impacts of Customer ECRs to senior leadership at Program Review Boards; created a supply chain quick-screening methodology (SAP SCM) that accelerated impact assessment by 40%.</li>
+        <li>Strengthened proposal submissions by reviewing Basis of Estimate (BOE) and Supplier Statement of Work (SSOW) documentation and maintaining a standardized SharePoint document control environment, driving successful contract awards and cross-functional collaboration.</li>
+      </ul>
+    </div>
+
+    <div class="job fade-up">
+      <div class="job-meta">
+        <span class="job-company">Northrop Grumman</span>
+        <span class="job-period">Apr 2015 – Jul 2016 · Redondo Beach, CA</span>
+      </div>
+      <div class="job-title">Systems Engineer I (Space Systems)</div>
+      <ul class="job-bullets">
+        <li>Served as Responsible Systems Engineer (RSE) and V&amp;V SE Analyst for a RF Space Systems Program, working across Unit, Subsystem, and Payload levels during Integration &amp; Test phase.</li>
+        <li>Formulated derived technical requirements, test data validation plans, and MATLAB/Python validation tools (Antenna Rolloff/Scan Loss, Link Budget, Noise Temperature, Command &amp; Telemetry Cal-Curve) to verify compliance against specifications and the VCRM.</li>
+        <li>Reviewed and audited RF subsystem test plans, procedures, and pass/fail limits during real-time thermal cycle testing; troubleshot Phase Noise and Spectral Emissions/Spurs anomalies and delivered resolutions to senior management.</li>
+        <li>Enhanced data-trending tools in Excel VBA and Python to accelerate test data review and proactively identify discrepancies prior to delivery.</li>
       </ul>
     </div>
 
@@ -860,26 +884,9 @@ footer {
         <span class="job-company">Raytheon (Intern)</span>
         <span class="job-period">June 2014 – Sept 2014 · El Segundo, CA</span>
       </div>
-      <div class="job-title">Systems Engineer Intern — PMO</div>
+      <div class="job-title">Systems Engineer Intern (Aviation)</div>
       <ul class="job-bullets">
-        <li>Supported Proposal Team in new business development — drafted Statement of Work (SOW) and assisted in building Work Breakdown Structure (WBS) for incoming program bids.</li>
-        <li>Assisted Cost Account Manager with Earned Value Management (EVM) cost tracking and updating program status reporting.</li>
-        <li>Visited supplier and vendor facilities in McKinney TX and Goleta CA to monitor electrical board manufacturing progress and confirm COTS product schedules and quality.</li>
-        <li>Developed RADAR hardware specification tree; assisted software engineers with time-latency diagrams and software flow diagrams for RADAR software systems.</li>
-        <li>Reviewed Bills of Material (BOMs) and facilitated fact-finding activities to support cross-functional proposal submissions.</li>
-      </ul>
-    </div>
-
-    <div class="job fade-up">
-      <div class="job-meta">
-        <span class="job-company">L3 Technologies</span>
-        <span class="job-period">July 2012 – Sept 2012 · San Diego, CA</span>
-      </div>
-      <div class="job-title">Software / DSP Engineer Intern</div>
-      <ul class="job-bullets">
-        <li>Analyzed source code file dependencies and OS adaptation requirements; generated final executables for Simulator installation on both Windows and Linux operating systems.</li>
-        <li>Implemented new features including noise and data randomization on a PHY C Simulator using C and C++.</li>
-        <li>Improved demodulator performance by testing new approaches and running Bit Error Rate (BER) performance evaluations on the PHY layer.</li>
+        <li>Assisted RADAR systems engineering by developing hardware specification trees and time-latency and flow diagrams for Radar Software; contributed to proposal development (Statement of Work/Work Breakdown Structure — SOW/WBS) and EVM cost tracking for the PMO.</li>
       </ul>
     </div>
 
@@ -888,12 +895,9 @@ footer {
         <span class="job-company">Wright Patterson AFB</span>
         <span class="job-period">June 2011 – Sept 2011 · Dayton, OH</span>
       </div>
-      <div class="job-title">Hardware / RF Engineer Intern</div>
+      <div class="job-title">Hardware/RF Engineer Intern</div>
       <ul class="job-bullets">
-        <li>Designed and built a Software-Defined S-Band RADAR system using off-the-shelf RF components, contributing to a novel research program in wavelet-based waveforms.</li>
-        <li>Programmed Arbitrary Waveform Generator (AWG) to generate RADAR signals; created AM signals using a Frequency Generator.</li>
-        <li>Calibrated hardware using Spectrum Analyzer and Vector Network Analyzer (VNA) to verify signal integrity and system performance.</li>
-        <li>Co-authored peer-reviewed IEEE publication on the developed RADAR system; received Best Poster Presentation Award at Wright Patterson AFB.</li>
+        <li>Built a RADAR system using off-the-shelf components; programmed an Arbitrary Waveform Generator (AWG) to produce RADAR signals and calibrated hardware using a Spectrum Analyzer and Vector Network Analyzer (VNA).</li>
       </ul>
     </div>
 
@@ -918,17 +922,28 @@ footer {
         <span class="skill-tag">Visual Studio</span>
         <span class="skill-tag">Modelsim</span>
         <span class="skill-tag">PSpice</span>
-        <span class="skill-tag">Jira / Confluence</span>
+        <span class="skill-tag">Jira</span>
+        <span class="skill-tag">Confluence</span>
+        <span class="skill-tag">IBM DOORS</span>
       </div>
       <div class="skill-category-title">Systems &amp; Program Tools</div>
       <div class="skill-tags">
-        <span class="skill-tag hi">IBM DOORS</span>
-        <span class="skill-tag hi">SAP SCM</span>
-        <span class="skill-tag hi">Microsoft Project</span>
-        <span class="skill-tag hi">SharePoint</span>
-        <span class="skill-tag hi">Earned Value Mgmt</span>
-        <span class="skill-tag hi">Raytheon Six Sigma Black Belt</span>
-        <span class="skill-tag hi">V-Model / Waterfall</span>
+        <span class="skill-tag">IBM DOORS</span>
+        <span class="skill-tag">SAP SCM</span>
+        <span class="skill-tag">Microsoft Project</span>
+        <span class="skill-tag">SharePoint</span>
+        <span class="skill-tag">Earned Value Mgmt</span>
+        <span class="skill-tag">Raytheon Six Sigma Black Belt</span>
+        <span class="skill-tag">V-Model / Waterfall</span>
+        <span class="skill-tag">Requirements Traceability</span>
+        <span class="skill-tag">VCRM Development</span>
+        <span class="skill-tag">ICD Authoring</span>
+        <span class="skill-tag">Requirements Allocation Matrix (RAM)</span>
+        <span class="skill-tag">Technical Performance Measures (TPM)</span>
+        <span class="skill-tag">Integrated Master Schedule (IMS)</span>
+        <span class="skill-tag">Milestone Reviews (SRR/SDR/PDR/CDR/MDR)</span>
+        <span class="skill-tag">PMO Support</span>
+        <span class="skill-tag">Proposal Support (SOW/WBS/BOE)</span>
       </div>
     </div>
     <div class="fade-up">
@@ -937,11 +952,14 @@ footer {
         <span class="skill-tag">Space Payload Systems</span>
         <span class="skill-tag">Electronic Warfare</span>
         <span class="skill-tag">F-35 Avionics (LRIP)</span>
+        <span class="skill-tag">Aircraft Systems</span>
+        <span class="skill-tag">UAV Systems</span>
         <span class="skill-tag">EO/IR Satellites</span>
         <span class="skill-tag">RF / Link Budgets</span>
         <span class="skill-tag">Radar Systems</span>
         <span class="skill-tag">Signal Processing / DSP</span>
         <span class="skill-tag">Command &amp; Telemetry</span>
+        <span class="skill-tag">Systems Integration &amp; Test</span>
         <span class="skill-tag">Power Analysis</span>
       </div>
       <div class="skill-category-title">Hardware</div>
@@ -1017,7 +1035,7 @@ footer {
     <span class="section-num" style="color: var(--accent);">06 —</span>
     <h2 class="section-title" style="color:var(--ink);">Scholarships &amp; <em style="color:var(--accent2);">Honor Societies</em></h2>
   </div>
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;" class="fade-up">
+  <div class="honors-grid fade-up">
 
     <!-- SCHOLARSHIPS -->
     <div>
@@ -1095,7 +1113,40 @@ footer {
       </div>
     </div>
 
-  </div>
+    <!-- CORPORATE AWARDS -->
+    <div>
+      <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1.8rem;">
+        Corporate Awards
+      </div>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+
+        <div style="display:flex; gap:1.2rem; align-items:flex-start; padding:1.4rem 1.5rem; border:1px solid var(--rule); background:var(--card);">
+          <span style="font-size:1.5rem; flex-shrink:0;">🎖️</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; color:var(--ink); margin-bottom:0.25rem;">Northrop Grumman COW Award</div>
+            <div style="font-family:'DM Mono',monospace; font-size:0.67rem; color:var(--muted); line-height:1.6;">Recognizing outstanding individual contribution and engineering excellence · Northrop Grumman</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1.2rem; align-items:flex-start; padding:1.4rem 1.5rem; border:1px solid var(--rule); background:var(--card);">
+          <span style="font-size:1.5rem; flex-shrink:0;">⭐</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; color:var(--ink); margin-bottom:0.25rem;">Raytheon RSTAR Award (x8)</div>
+            <div style="font-family:'DM Mono',monospace; font-size:0.67rem; color:var(--muted); line-height:1.6;">Peer-nominated recognition for outstanding performance and technical impact · Awarded 8 times · Raytheon Intelligence &amp; Space</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1.2rem; align-items:flex-start; padding:1.4rem 1.5rem; border:1px solid var(--rule); background:var(--card);">
+          <span style="font-size:1.5rem; flex-shrink:0;">🏅</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; color:var(--ink); margin-bottom:0.25rem;">SAIC Award</div>
+            <div style="font-family:'DM Mono',monospace; font-size:0.67rem; color:var(--muted); line-height:1.6;">Recognizing excellence in FFRDC/SETA systems engineering and technical advisory support · SAIC</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </section>
 
