@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 04 — Solar Power Battery SOC/DOD Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#00ff9d;--accent2:#00d4ff;--accent3:#ff6b35;--text:#c8dde8;--muted:#4a6a80; }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh; }
+  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,255,157,0.018) 1px,transparent 1px),linear-gradient(90deg, rgba(0,255,157,0.018) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
+  nav { position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:20px 40px;border-bottom:1px solid var(--border); }
+  .nav-back { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);text-decoration:none;letter-spacing:0.15em;transition:opacity 0.2s; }
+  .nav-back:hover { opacity:0.7; }
+  .nav-divider { color:var(--border); }
+  .nav-label { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em; }
+  .hero { position:relative;z-index:10;padding:60px 40px 40px;max-width:960px;margin:0 auto; }
+  .project-badge { font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:14px; }
+  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,4.6vw,2.6rem);font-weight:900;letter-spacing:0.02em;line-height:1.2;background:linear-gradient(135deg,#fff 0%,var(--accent) 55%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
+  .hero-meta { display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px; }
+  .meta-chip { font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:5px 12px;border:1px solid var(--border);border-radius:2px;color:var(--muted);letter-spacing:0.12em; }
+  .meta-chip.accent { border-color:var(--accent);color:var(--accent); }
+  .code-cta { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border:1px solid var(--accent);color:var(--accent);background:rgba(0,255,157,0.06);transition:background 0.2s,color 0.2s; }
+  .code-cta:hover { background:rgba(0,255,157,0.18);color:#fff; }
+  .section-divider { height:1px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);max-width:960px;margin:40px auto;position:relative;z-index:10; }
+  .content { position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 40px 80px;display:flex;flex-direction:column;gap:48px; }
+  .section-label { font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px; }
+  .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
+  h2 { font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.03em; }
+  h3 { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:var(--accent2);margin:20px 0 10px;letter-spacing:0.03em; }
+  p { font-size:1rem;line-height:1.8;color:var(--text);font-weight:300;margin-bottom:12px; }
+  .formula-box { background:#040c14;border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:3px;padding:20px 24px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#ffcc80;line-height:2;margin-bottom:14px;overflow-x:auto; }
+  .result-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px; }
+  .result-card { background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:3px;padding:20px; }
+  .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
+  .result-card .r-label { font-size:0.76rem;color:var(--muted);letter-spacing:0.04em; }
+  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:12px; }
+  ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
+  ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
+  table { width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:16px; }
+  th, td { border:1px solid var(--border);padding:8px 10px;text-align:left;color:var(--text); }
+  th { background:var(--card);color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;font-size:0.62rem; }
+  td.num { text-align:right;color:#ffcc80; }
+  tr.total td { color:#fff;font-weight:700;background:rgba(0,255,157,0.06); }
+  .table-wrap { overflow-x:auto; }
+  .note { font-size:0.85rem;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:14px;margin-bottom:12px; }
+  @media (max-width:600px) { nav { padding:16px 20px; } .hero { padding:40px 20px 30px; } .content { padding:0 20px 60px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="index.html">← BACK</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-label">PROJECT_04 · SOLAR POWER BATTERY SOC / DOD SIMULATION</span>
+</nav>
+
+<div class="hero">
+  <div class="project-badge">// PROJECT_04 &nbsp;&nbsp; SPACECRAFT POWER SYSTEMS · MATLAB</div>
+  <h1>Solar Power Battery State of Charge (SOC) / Depth of Discharge (DOD) Simulation</h1>
+  <div class="hero-meta">
+    <span class="meta-chip accent">GEO Spacecraft</span>
+    <span class="meta-chip">Li-ion Battery Aging</span>
+    <span class="meta-chip">Solar Array IV/PV</span>
+    <span class="meta-chip">SOC / DOD</span>
+    <span class="meta-chip">15-Year Mission Life</span>
+  </div>
+  <a class="code-cta" href="https://github.com/queeniencoffee/portfolio/tree/main/ShowCase/SolarBattery_StateofCharge" target="_blank">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+    Access to MATLAB Code
+  </a>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="content">
+
+  <section>
+    <div class="section-label">01 &nbsp; Overview</div>
+    <h2>Physics-Based GEO Electrical Power System Model</h2>
+    <p>This model simulates the electrical power system (EPS) of a ~5.5 kW GEO communications/USSF-class spacecraft across its full 15-year design life: solar-array generation, Li-ion battery cycling and aging, and bus loads across every operational mode. It runs in base MATLAB (R2018b+, no toolboxes required) and completes a 15-year, ~1,361-cycle run in roughly 30–90 seconds.</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Reference Design</th><th></th></tr>
+      <tr><td>Orbit</td><td>GEO, circular, i≈0°, sidereal period 86,164 s</td></tr>
+      <tr><td>Bus</td><td>100 V regulated, S3R (DET) primary power, BCR/BDR battery interface</td></tr>
+      <tr><td>Array</td><td>3G30C-class triple-junction GaAs, 50s × 176 strings, 8,800 cells, 24.1 m²</td></tr>
+      <tr><td>Battery</td><td>Li-ion 24s2p, 60 Ah cells → 120 Ah, 87.6 V nominal, 10.5 kWh BOL</td></tr>
+      <tr><td>Loads</td><td>NOMINAL 5.47 kW · PEAK_TX 6.57 kW · ECLIPSE 4.55 kW · STATIONKEEP 6.52 kW · SAFE 1.25 kW</td></tr>
+      <tr><td>Life</td><td>15 yr, ~91 eclipses/yr, 1,361 cycles simulated</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">02 &nbsp; Key Model Equations</div>
+    <h2>Eclipse Geometry, Solar Cell, Battery ECM &amp; Aging</h2>
+    <h3>Eclipse duration (cylindrical umbra, circular orbit)</h3>
+    <div class="formula-box">T_ecl = T_orb/180 · acosd[ √(r² − R_E²) / (r·cos β) ]</div>
+    <p>For GEO this produces a 69.4-minute maximum eclipse, occurring only when |β| &lt; 8.70° — i.e. two ~45-day eclipse seasons per year straddling the equinoxes. Both figures are reproduced by the model and printed as verification checks on every run.</p>
+
+    <h3>Solar cell (empirical exponential IV fit, "Green" form)</h3>
+    <div class="formula-box">I(V) = Isc·[1 − C1·(exp(V/(C2·Voc)) − 1)],  C2 = (Vmp/Voc − 1)/ln(1 − Imp/Isc)</div>
+    <p>Cheaper than the implicit single-diode equation and accurate through the knee. Under DET/S3R the array is clamped to the bus, so it operates at I(V_bus/Ns) rather than at the maximum power point — the config flag <code>C.sa.regulation</code> switches between 'DET' and 'MPPT' to compare.</p>
+
+    <h3>Battery (2nd-order Thevenin ECM, per cell, backward Euler)</h3>
+    <div class="formula-box">V = OCV(SOC) − I·R0 − V1 − V2,   dSOC/dt = −I/(3600·Q_now)</div>
+    <p>Sign convention: I &gt; 0 = discharge. R0/R1/R2 carry a mild SOC dependence, an Arrhenius temperature term, and a growth term coupled to accumulated capacity fade.</p>
+
+    <h3>Aging (semi-empirical, state-shifted)</h3>
+    <div class="formula-box">Q_cal = k_cal·exp(−Ea_cal/RT)·exp(a·SOC) · t_eff^0.75
+Q_cyc = k_cyc·exp(−Ea_cyc/RT)·exp(b·C_rate) · Ah_eff^0.55
+R0(t) = R0_BOL · (1 + 0.60·fade/fade_EOL)</div>
+    <p>At each step the effective time/throughput is back-solved from accumulated damage under the current stress, incremented, then recomputed — keeping the fade law monotonic and path-independent under time-varying stress. An independent cross-check runs in parallel: a Wöhler DOD curve N_fail = N0·DOD⁻ᵐ with Miner's rule accumulation.</p>
+  </section>
+
+  <section>
+    <div class="section-label">03 &nbsp; Model Architecture</div>
+    <h2>File Roles</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>File</th><th>Role</th></tr>
+      <tr><td>eps_config.m</td><td>Single source of truth — every parameter in the model lives here</td></tr>
+      <tr><td>geo_lib.m</td><td>GEO geometry: β angle, umbra/penumbra timing, solar flux, SADA cosine loss</td></tr>
+      <tr><td>solar_lib.m</td><td>Triple-junction GaAs array: IV curve, temperature, radiation/UV degradation, DET vs MPPT</td></tr>
+      <tr><td>battery_lib.m</td><td>Li-ion: OCV, 2nd-order Thevenin ECM, CC-CV charge controller, calendar + cycle aging</td></tr>
+      <tr><td>sim_orbit.m</td><td>One sidereal day at 1 Hz with the S3R/BCR/BDR bus manager</td></tr>
+      <tr><td>sim_mission.m</td><td>15 years: every eclipse cycle integrated, solstice days advanced analytically</td></tr>
+      <tr><td>run_geo_eps_model.m</td><td>Driver: power budget, BOL/EOL orbits, aging run, verification, 6 figures</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">04 &nbsp; Results</div>
+    <h2>BOL vs. EOL (15-Year) Performance</h2>
+    <div class="result-grid">
+      <div class="result-card"><div class="r-val">52.2% → 67.0%</div><div class="r-label">Worst-case DOD (BOL → EOL, limit 75%)</div></div>
+      <div class="result-card"><div class="r-val">20.1%</div><div class="r-label">Capacity fade at EOL (12.0% calendar + 8.0% cycling)</div></div>
+      <div class="result-card"><div class="r-val">×1.60</div><div class="r-label">R0 (internal resistance) growth</div></div>
+      <div class="result-card"><div class="r-val">568</div><div class="r-label">Equivalent full cycles at EOL</div></div>
+      <div class="result-card"><div class="r-val">8.91 kW → 7.37 kW</div><div class="r-label">Array power to bus, hot &amp; sun-pointed</div></div>
+      <div class="result-card"><div class="r-val">3.67 V → 3.55 V</div><div class="r-label">Min cell voltage in eclipse (cutoff 3.00 V)</div></div>
+    </div>
+    <h3>Figures Generated</h3>
+    <ul>
+      <li><strong>Worst-case eclipse orbit</strong> — array capability, bus load, shunt, battery current/voltage, SOC, array temperature, and mode timeline; BOL vs EOL overlaid.</li>
+      <li><strong>Battery cycle detail</strong> — cell voltage and pack current vs cycle time, spanning eclipse discharge → CC recharge → CV taper → float.</li>
+      <li><strong>Eclipse season</strong> — β angle, eclipse duration, and the triangular DOD-per-eclipse profile.</li>
+      <li><strong>Aging</strong> — calendar/cycling fade split, retention vs equivalent full cycles, R0 growth, Miner damage, and DOD creep as capacity fades.</li>
+      <li><strong>Margins</strong> — load by mode against array capability; energy margin on the worst eclipse of each year.</li>
+      <li><strong>Array IV/PV</strong> — BOL/EOL × hot/cold, with the bus voltage line showing the S3R operating point.</li>
+    </ul>
+    <p>Verification checks printed on every run confirm the max eclipse (69.4 min), β cutoff (8.70°), ~91 eclipse days/year, an energy-balance residual near zero, and pass/fail status on EOL DOD, EOL cell voltage, and EOL energy margin against their design limits.</p>
+  </section>
+
+  <section>
+    <div class="section-label">05 &nbsp; Calibration &amp; Known Limitations</div>
+    <h2>What to Fit Before Trusting This for a Real Trade</h2>
+    <p><code>k_cal</code>, <code>k_cyc</code>, <code>N0</code>, <code>m</code>, and the OCV table are calibrated placeholders tuned to hit a 20% fade / 80% retention requirement at 15 years — they are not vendor data. The two built-in aging models also disagree by roughly 3×: the semi-empirical law predicts 20% fade, while Miner's rule (N0=1000, m=2) predicts ~7% fade-equivalent damage. That spread is the single largest uncertainty in the battery sizing and should be resolved with cell-level test data rather than averaged.</p>
+    <ul>
+      <li>Cylindrical shadow with a linear penumbra ramp; no atmospheric refraction/penumbra photometry.</li>
+      <li>Equatorial orbit assumption (β = solar declination); an inclined or drifting GEO needs a proper sun-vector/orbit-normal dot product.</li>
+      <li>Single lumped battery thermal node held at 20°C — no eclipse-driven thermal swing modeled.</li>
+      <li>Cell-to-cell imbalance, string failure/bypass, and BMS balancing are not modeled.</li>
+      <li>Array degradation uses lumped annual factors rather than SPENVIS/EQFLUX fluence-based remaining-power curves.</li>
+    </ul>
+    <div class="note">If migrating to Simscape Battery: <code>battery_lib</code> maps onto the Battery Equivalent Circuit block's Lookup Tables (temperature and current dependent) cycling-aging option — generate the 3-D CapacityChange(N,T,I) table by sweeping this model's <code>aging_step</code>, or directly from cell test data.</div>
+  </section>
+
+</div>
+</body>
+</html>
