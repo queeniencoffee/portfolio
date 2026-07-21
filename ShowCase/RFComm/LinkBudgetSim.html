@@ -151,6 +151,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     const resourceScript = '<script>window.__resources = ' +
       JSON.stringify(resourceMap).replace(/<\//g, '<\\/') +
       ';</' + 'script>';
+    // The app's fixed 2-column grid (map + link status card) and the fixed
+    // 560px map height don't collapse on narrow viewports, which forces a
+    // horizontal scrollbar on phones. A plain injected <style> gets dropped
+    // by the app's own streaming/hydration pass, which rebuilds <head>
+    // after this script runs — so instead inject a <script> that (re)adds
+    // the fix style and keeps reasserting it via MutationObserver, since
+    // scripts survive that rebuild (confirmed by window.__resources above).
+    const mobileFixScript = '<script>(' + function () {
+      function ensureMobileFix() {
+        if (document.getElementById('__mobile_fix_style')) return;
+        var s = document.createElement('style');
+        s.id = '__mobile_fix_style';
+        s.textContent = '@media (max-width:900px){div[style*="1.5fr 1fr"]{grid-template-columns:1fr!important;}}' +
+          '@media (max-width:640px){div[style*="height: 560px"]{height:340px!important;}' +
+          'table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}}';
+        document.head.appendChild(s);
+      }
+      ensureMobileFix();
+      new MutationObserver(ensureMobileFix).observe(document.documentElement, { childList: true, subtree: true });
+    }.toString() + ')();</' + 'script>';
     // Inject after <head> so the DOCTYPE stays first; prepending the script
     // would push the parser into quirks mode. DOMParser always emits a <head>
     // (synthesizing one if the source HTML omitted it) but may carry
@@ -159,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const headOpen = template.match(/<head[^>]*>/i);
     if (headOpen) {
       const i = headOpen.index + headOpen[0].length;
-      template = template.slice(0, i) + resourceScript + template.slice(i);
+      template = template.slice(0, i) + resourceScript + mobileFixScript + template.slice(i);
     }
 
     // Parse the template and swap the root element. Scripts inserted via

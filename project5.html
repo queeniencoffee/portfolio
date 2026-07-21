@@ -40,16 +40,21 @@
   .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
   .result-card .r-label { font-size:0.76rem;color:var(--muted);letter-spacing:0.04em; }
   ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:12px; }
-  ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
-  ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
+  ul li { position:relative;padding-left:20px;font-size:0.95rem;color:var(--text);line-height:1.6; }
+  ul li::before { content:'›';position:absolute;left:0;top:0;color:var(--accent);font-size:1.2rem;line-height:1.3; }
   table { width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:16px; }
   th, td { border:1px solid var(--border);padding:8px 10px;text-align:left;color:var(--text); }
   th { background:var(--card);color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;font-size:0.62rem; }
   td.num { text-align:right;color:#ffcc80; }
   .table-wrap { overflow-x:auto; }
   .note { font-size:0.85rem;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:14px;margin-bottom:12px; }
-  .video-embed { position:relative;width:100%;padding-top:56.25%;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:8px; }
-  .video-embed iframe { position:absolute;top:0;left:0;width:100%;height:100%;border:0; }
+  .demo-box { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--card);border:1px solid var(--accent);border-radius:4px;padding:36px 28px;text-align:center;position:relative;overflow:hidden; }
+  .demo-box::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,255,157,0.06) 0%,transparent 70%);pointer-events:none; }
+  .demo-box-label { font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase; }
+  .demo-box-title { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;letter-spacing:0.05em; }
+  .demo-btn { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--bg);background:var(--accent);border:none;border-radius:2px;padding:12px 26px;text-decoration:none;cursor:pointer;transition:background 0.2s,transform 0.15s,box-shadow 0.2s;box-shadow:0 0 20px rgba(0,255,157,0.25);position:relative;z-index:1; }
+  .demo-btn:hover { background:#33ffb5;transform:translateY(-2px);box-shadow:0 0 32px rgba(0,255,157,0.45); }
+  .demo-btn svg { width:13px;height:13px;fill:var(--bg);flex-shrink:0; }
   @media (max-width:600px) { nav { padding:16px 20px; } .hero { padding:40px 20px 30px; } .content { padding:0 20px 60px; } }
 </style>
 </head>
@@ -84,12 +89,21 @@
 <div class="content">
 
   <section>
+    <div class="section-label">00 &nbsp; Demo Videos</div>
+    <div class="demo-box">
+      <div class="demo-box-label">Demo Video</div>
+      <div class="demo-box-title">UAV 2D 3D NavPlan Visualizer Demo</div>
+      <a class="demo-btn" href="https://www.youtube.com/watch?v=wasJs4dVwQQ" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.8 8.001a2.749 2.749 0 0 0-1.935-1.946C18.07 5.5 12 5.5 12 5.5s-6.07 0-7.865.555A2.749 2.749 0 0 0 2.2 8.001 28.8 28.8 0 0 0 1.65 12a28.8 28.8 0 0 0 .55 3.999 2.749 2.749 0 0 0 1.935 1.946C5.93 18.5 12 18.5 12 18.5s6.07 0 7.865-.555a2.749 2.749 0 0 0 1.935-1.946A28.8 28.8 0 0 0 22.35 12a28.8 28.8 0 0 0-.55-3.999zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+        Watch on YouTube
+      </a>
+    </div>
+  </section>
+
+  <section>
     <div class="section-label">01 &nbsp; Overview</div>
     <h2>Synchronized 2-D / 3-D UAV Navigation Plan Visualization</h2>
     <p>This tool displays a UAV navigation plan — Control Station → Clamshell Peak → Mount Wilson Observatory → Control Station — over the Eaton Fire area of interest in the San Gabriel Mountains, CA. It renders the route side-by-side on a 2-D geographic map and a 3-D geographic globe using MATLAB's Mapping Toolbox (<code>geoaxes</code>, <code>geoglobe</code>, <code>geoplot3</code>), then flies a synchronized chase camera along the mission while live trajectory, speed, and attitude analysis plots update in real time. It was built for Group Project #3 (Supporting Infrastructure Design) in UASE 501 — Intro to UAV.</p>
-    <div class="video-embed">
-      <iframe src="https://www.youtube.com/embed/wasJs4dVwQQ" title="UAV 2D 3D NavPlan Visualizer Demo" allowfullscreen></iframe>
-    </div>
   </section>
 
   <section>
