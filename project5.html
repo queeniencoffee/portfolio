@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 05 — UAV 2D 3D NavPlan Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050a10;--surface:#0b1420;--card:#0d1a2a;--border:#1a3a5c;--accent:#00ff9d;--accent2:#00d4ff;--accent3:#ff6b35;--text:#c8dde8;--muted:#4a6a80; }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh; }
+  body::after { content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,255,157,0.018) 1px,transparent 1px),linear-gradient(90deg, rgba(0,255,157,0.018) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0; }
+  nav { position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:20px 40px;border-bottom:1px solid var(--border); }
+  .nav-back { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);text-decoration:none;letter-spacing:0.15em;transition:opacity 0.2s; }
+  .nav-back:hover { opacity:0.7; }
+  .nav-divider { color:var(--border); }
+  .nav-label { font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em; }
+  .hero { position:relative;z-index:10;padding:60px 40px 40px;max-width:960px;margin:0 auto; }
+  .project-badge { font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:14px; }
+  h1 { font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,4.6vw,2.6rem);font-weight:900;letter-spacing:0.02em;line-height:1.2;background:linear-gradient(135deg,#fff 0%,var(--accent) 55%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px; }
+  .hero-meta { display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px; }
+  .meta-chip { font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:5px 12px;border:1px solid var(--border);border-radius:2px;color:var(--muted);letter-spacing:0.12em; }
+  .meta-chip.accent { border-color:var(--accent);color:var(--accent); }
+  .hero-img { width:100%;max-width:960px;border:1px solid var(--border);border-radius:4px;margin:0 auto 24px;display:block; }
+  .cta-row { display:flex;flex-wrap:wrap;gap:14px; }
+  .code-cta { display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border:1px solid var(--accent);color:var(--accent);background:rgba(0,255,157,0.06);transition:background 0.2s,color 0.2s; }
+  .code-cta:hover { background:rgba(0,255,157,0.18);color:#fff; }
+  .code-cta.alt { border-color:var(--accent2);color:var(--accent2);background:rgba(0,212,255,0.06); }
+  .code-cta.alt:hover { background:rgba(0,212,255,0.18);color:#fff; }
+  .section-divider { height:1px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);max-width:960px;margin:40px auto;position:relative;z-index:10; }
+  .content { position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 40px 80px;display:flex;flex-direction:column;gap:48px; }
+  .section-label { font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px; }
+  .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
+  h2 { font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.03em; }
+  h3 { font-family:'Orbitron',sans-serif;font-size:0.95rem;font-weight:700;color:var(--accent2);margin:20px 0 10px;letter-spacing:0.03em; }
+  p { font-size:1rem;line-height:1.8;color:var(--text);font-weight:300;margin-bottom:12px; }
+  .formula-box { background:#040c14;border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:3px;padding:20px 24px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#ffcc80;line-height:2;margin-bottom:14px;overflow-x:auto; }
+  .result-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px; }
+  .result-card { background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:3px;padding:20px; }
+  .result-card .r-val { font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--accent);margin-bottom:4px; }
+  .result-card .r-label { font-size:0.76rem;color:var(--muted);letter-spacing:0.04em; }
+  ul { padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:12px; }
+  ul li { display:flex;align-items:flex-start;gap:10px;font-size:0.95rem;color:var(--text);line-height:1.6; }
+  ul li::before { content:'›';color:var(--accent);font-size:1.2rem;line-height:1.3;flex-shrink:0; }
+  table { width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:16px; }
+  th, td { border:1px solid var(--border);padding:8px 10px;text-align:left;color:var(--text); }
+  th { background:var(--card);color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;font-size:0.62rem; }
+  td.num { text-align:right;color:#ffcc80; }
+  .table-wrap { overflow-x:auto; }
+  .note { font-size:0.85rem;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:14px;margin-bottom:12px; }
+  .video-embed { position:relative;width:100%;padding-top:56.25%;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:8px; }
+  .video-embed iframe { position:absolute;top:0;left:0;width:100%;height:100%;border:0; }
+  @media (max-width:600px) { nav { padding:16px 20px; } .hero { padding:40px 20px 30px; } .content { padding:0 20px 60px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="index.html">← BACK</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-label">PROJECT_05 · UAV 2D 3D NAVPLAN VISUALIZER</span>
+</nav>
+
+<div class="hero">
+  <div class="project-badge">// PROJECT_05 &nbsp;&nbsp; UAV MISSION PLANNING · MATLAB MAPPING TOOLBOX</div>
+  <h1>UAV 2D 3D NavPlan Visualizer</h1>
+  <div class="hero-meta">
+    <span class="meta-chip accent">Eaton Fire AOI · San Gabriel Mountains</span>
+    <span class="meta-chip">Geoaxes / Geoglobe</span>
+    <span class="meta-chip">Synchronized Camera Flight-Through</span>
+    <span class="meta-chip">Trajectory / Speed / Attitude Analysis</span>
+  </div>
+  <img class="hero-img" src="img/UAV_2D3DVisualizer.png" alt="UAV 2D 3D NavPlan Visualizer">
+  <div class="cta-row">
+    <a class="code-cta" href="https://www.youtube.com/watch?v=wasJs4dVwQQ" target="_blank">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Watch Demo Video
+    </a>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="content">
+
+  <section>
+    <div class="section-label">01 &nbsp; Overview</div>
+    <h2>Synchronized 2-D / 3-D UAV Navigation Plan Visualization</h2>
+    <p>This tool displays a UAV navigation plan — Control Station → Clamshell Peak → Mount Wilson Observatory → Control Station — over the Eaton Fire area of interest in the San Gabriel Mountains, CA. It renders the route side-by-side on a 2-D geographic map and a 3-D geographic globe using MATLAB's Mapping Toolbox (<code>geoaxes</code>, <code>geoglobe</code>, <code>geoplot3</code>), then flies a synchronized chase camera along the mission while live trajectory, speed, and attitude analysis plots update in real time. It was built for Group Project #3 (Supporting Infrastructure Design) in UASE 501 — Intro to UAV.</p>
+    <div class="video-embed">
+      <iframe src="https://www.youtube.com/embed/wasJs4dVwQQ" title="UAV 2D 3D NavPlan Visualizer Demo" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">02 &nbsp; Mission Plan</div>
+    <h2>Waypoints &amp; Area of Interest</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Waypoint</th><th>Lat (deg)</th><th>Lon (deg)</th><th>Alt (ft MSL)</th></tr>
+      <tr><td>UAV Control Station</td><td class="num">34.1700</td><td class="num">-118.0500</td><td class="num">1,700</td></tr>
+      <tr><td>Clamshell Peak</td><td class="num">34.2021</td><td class="num">-117.9980</td><td class="num">6,100</td></tr>
+      <tr><td>Mount Wilson Observatory</td><td class="num">34.2258</td><td class="num">-118.0610</td><td class="num">6,200</td></tr>
+      <tr><td>UAV Control Station (return)</td><td class="num">34.1700</td><td class="num">-118.0500</td><td class="num">1,700</td></tr>
+    </table>
+    </div>
+    <p>Altitudes are engineering assumptions (~500 ft AGL overflight above each peak's approximate summit elevation) since no DEM/terrain file was supplied for this AOI; the model is structured to swap in <code>readgeoraster()</code>-derived terrain heights if a local DEM becomes available. Two campsites and both summits are plotted as AOI markers on the 2-D map for situational context alongside the flight route.</p>
+  </section>
+
+  <section>
+    <div class="section-label">03 &nbsp; Vehicle Performance &amp; Kinematics</div>
+    <h2>Aerosonde-Class Envelope &amp; Track-Derived Attitude</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Parameter</th><th>Value</th></tr>
+      <tr><td>Stall speed</td><td class="num">23.3 kts</td></tr>
+      <tr><td>Max speed</td><td class="num">70 kts</td></tr>
+      <tr><td>Roll (bank) limit</td><td class="num">&#177;30 deg</td></tr>
+      <tr><td>Pitch limit</td><td class="num">&#177;20 deg</td></tr>
+      <tr><td>Assumed wind</td><td class="num">10 kts from 250° (WSW)</td></tr>
+    </table>
+    </div>
+    <h3>Ground speed from commanded airspeed + wind</h3>
+    <div class="formula-box">V&#8407;_g = V&#8407;_a(V_a, &#968;) + V&#8407;_wind</div>
+    <p>Commanded true airspeed is interpolated per leg (slower on climb-out and final approach, cruise speed on the ridgeline transit) and vector-summed with a constant assumed wind to get ground speed and the time vector along the route.</p>
+    <h3>Bank angle (coordinated turn) &amp; flight-path angle</h3>
+    <div class="formula-box">&#966; = atan2(V_g &#183; d&#968;/dt, g)
+&#947; = atan(climb rate / horizontal speed)</div>
+    <p>A point-mass approximation derives roll from the coordinated-turn relation and pitch from the climb-rate-to-ground-speed ratio. The waypoint route has sharp corners that a real autopilot would fly as smooth curved turns/climbs; <code>movmean</code> smoothing removes that artifact so the attitude profile reads as an achievable trajectory rather than an instantaneous discontinuity.</p>
+  </section>
+
+  <section>
+    <div class="section-label">04 &nbsp; Display Layout</div>
+    <h2>Three-Panel Synchronized Interface</h2>
+    <ul>
+      <li><strong>2-D Flight Path (left):</strong> <code>geoaxes</code> with topographic basemap — UAV track, start/end markers, points of interest, campsites, and a live current-location marker with a real-time lat/lon/distance/altitude/heading readout.</li>
+      <li><strong>3-D Terrain View (center):</strong> <code>geoglobe</code> with satellite basemap — the route rendered in 3-D via <code>geoplot3</code>, with a chase camera (<code>campos</code>/<code>camheading</code>/<code>campitch</code>) that follows the vehicle 250 m above track height, pitched down 20°, heading-locked to the current course.</li>
+      <li><strong>Trajectory / Speed / Attitude Analysis (right):</strong> a 3-D spatial trajectory colored by AGL altitude, a speed profile (V_a vs. V_g against stall/max-speed limits), and a roll/pitch/heading time history with bank and pitch limit lines — all with live time-cursor markers synced to the flight-through.</li>
+    </ul>
+    <p>Both the 2-D and 3-D current-location markers, the globe camera, and the analysis-panel cursors update together on every playback step, so the geographic view, terrain view, and engineering plots stay in lockstep throughout the flight-through.</p>
+  </section>
+
+  <section>
+    <div class="section-label">05 &nbsp; Requirements &amp; Known Limitations</div>
+    <h2>What This Model Assumes</h2>
+    <ul>
+      <li>Requires MATLAB's Mapping Toolbox (<code>geoaxes</code>, <code>geoglobe</code>, <code>geoplot3</code>, camera navigation functions) and internet access for basemap/terrain imagery tiles.</li>
+      <li>No DEM was supplied for the AOI, so ground elevation at each waypoint is an assumed value rather than a measured terrain height.</li>
+      <li>Wind is modeled as constant in speed and direction across the entire route rather than varying spatially or with altitude.</li>
+      <li>Geoglobe marker styling is limited to filled circles ('o') — points of interest are distinguished by color rather than marker shape, unlike the 2-D map.</li>
+    </ul>
+    <div class="note">The route order, waypoint set, and vehicle performance limits follow the Group Project 3 mission prompt (UASE 501, Supporting Infrastructure Design, Sec. 2.0 Aerosonde performance data).</div>
+  </section>
+
+</div>
+</body>
+</html>
