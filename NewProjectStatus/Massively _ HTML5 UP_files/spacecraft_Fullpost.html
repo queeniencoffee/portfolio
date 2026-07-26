@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Spacecraft Dynamics Plant Model in MATLAB &amp; Simulink</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<meta name="description" content="6-DoF Spacecraft Dynamics plant model based on the MATLAB/Simulink Aerospace Blockset Spacecraft Dynamics block">
+	<link rel="stylesheet" href="./main(1).css">
+	<style>
+		/* --- Requested display size reductions --- */
+		/* Whole blogpost display shrunk to 75% of its width */
+		#main { max-width: 54rem; }
+		/* Blog post title reduced by half (4rem -> 2rem) */
+		#main > .post header.major > h1 { font-size: 2rem; }
+		@media screen and (max-width: 736px) {
+			#main > .post header.major > h1 { font-size: 1.25rem; }
+		}
+		/* Body text (and any inline content images) reduced by one third */
+		#main .post .content { zoom: 0.667; }
+		/* Hero image reduced by one third */
+		#main .post > .image.main { text-align: center; }
+		#main .post > .image.main img { width: 66.7%; height: auto; }
+
+		/* Post-specific tweaks */
+		#main .post .content table { margin-bottom: 2em; }
+		#main .post .content pre {
+			font-size: 0.72em;
+			line-height: 1.45;
+			overflow-x: auto;
+		}
+		#main .post .content pre code {
+			white-space: pre;
+			font-family: "Courier New", monospace;
+		}
+		#main .post .content blockquote {
+			border-left: solid 4px #efa8b0;
+			padding: 0.5em 0 0.5em 2em;
+		}
+		/* --- Self-contained static math (no MathJax dependency) --- */
+		.mv { font-style: italic; font-family: Georgia, "Times New Roman", serif; }
+		.vec { font-weight: 700; font-style: italic; font-family: Georgia, "Times New Roman", serif; }
+		.eq {
+			text-align: center;
+			font-family: Georgia, "Times New Roman", serif;
+			font-size: 1.15em;
+			line-height: 2.2;
+			margin: 1.25em 0;
+			overflow-x: auto;
+		}
+		.frac { display: inline-block; vertical-align: middle; text-align: center; margin: 0 0.2em; }
+		.frac > span { display: block; padding: 0 0.4em; line-height: 1.3; }
+		.frac > span.den { border-top: 1px solid currentColor; }
+		table.mtx {
+			display: inline-table;
+			vertical-align: middle;
+			border-left: 2px solid currentColor;
+			border-right: 2px solid currentColor;
+			margin: 0 0.3em;
+			border-collapse: collapse;
+		}
+		table.mtx td { text-align: center; padding: 0.15em 0.6em; font-size: 0.85em; }
+	</style>
+</head>
+<body class="">
+
+	<!-- Wrapper -->
+		<div id="wrapper" class="fade-in">
+
+			<!-- Header -->
+				<header id="header">
+					<a href="./saved_resource.html" class="logo">UAV Model Updates</a>
+				</header>
+
+			<!-- Nav -->
+				<nav id="nav">
+					<ul class="links">
+						<li><a href="./saved_resource.html">UAV Model Updates</a></li>
+						<li class="active"><a href="./spacecraft_resource.html">Spacecraft Plant model Updates</a></li>
+					</ul>
+					<ul class="icons">
+						<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+					</ul>
+				</nav>
+
+			<!-- Main -->
+				<div id="main">
+
+					<!-- Post -->
+						<article class="post">
+							<header class="major">
+								<span class="date">July 26, 2026</span>
+								<h1>Spacecraft Dynamics<br>
+								Plant Model in MATLAB<br>
+								&amp; Simulink</h1>
+								<p>A 6-DoF rigid-body spacecraft plant model built on the Aerospace Blockset Spacecraft Dynamics block</p>
+							</header>
+							<span class="image main"><img src="./SpacecraftPlantModel.png" alt="Simulink Spacecraft Dynamics Block Example Model: Flight Control, Spacecraft Plant, and Outputs"></span>
+							<div class="content">
+
+								<h2>1. What Is the Spacecraft Plant Model?</h2>
+								<p>Where the reduced-order UAV model treats the vehicle as a kinematic point-mass under an assumed autopilot, the <strong>spacecraft plant model</strong> is a full <strong>six-degrees-of-freedom (6-DoF) rigid-body</strong> propagator. It integrates the coupled <strong>translational</strong> and <strong>rotational</strong> equations of motion to compute the <strong>position</strong>, <strong>velocity</strong>, <strong>attitude</strong>, and <strong>angular velocity</strong> of one or more spacecraft over time.</p>
+								<p>This model is built around the MATLAB/Simulink <strong>Aerospace Blockset</strong> <code>Spacecraft Dynamics</code> block. In control-systems terms it is the <em>plant</em>: given the external forces and moments acting on the vehicle (thrust, gravity, drag, solar radiation pressure, control torques), it returns the resulting state trajectory that a guidance, navigation, and control (GNC) system is designed to steer.</p>
+								<blockquote>
+									<p><strong>Source:</strong> Technical details in this post follow the MathWorks documentation, <em>&ldquo;Getting Started with the Spacecraft Dynamics Block&rdquo;</em> (Aerospace Blockset). See <a href="https://www.mathworks.com/help/aeroblks/getting-started-with-the-spacecraft-dynamics-block.html">mathworks.com/help/aeroblks</a> for the authoritative reference.</p>
+								</blockquote>
+
+								<hr>
+
+								<h2>2. Architecture &amp; Block Overview</h2>
+<pre><code>                      +-------------------------------------------------------+
+  INPUT PORTS         |            SPACECRAFT DYNAMICS BLOCK (6-DoF)          |   OUTPUT PORTS
+  - Body Force  (F_b)-&gt;|                                                       |---&gt; Position  (r)   [ICRF / fixed]
+  - Body Moment (M_b)-&gt;|   +-----------------------------------------------+   |---&gt; Velocity  (v)   [ICRF / fixed]
+  - Ext. Accel  (a_e)-&gt;|   |         TRANSLATIONAL DYNAMICS (r, v)         |   |---&gt; Attitude  (q / DCM / Euler)
+                      |   |  a = F_b/m + a_grav + a_3rd + a_drag + a_srp   |   |---&gt; Ang. Velocity (&omega;)
+  MASS PROPERTIES     |   +-----------------------------------------------+   |
+  - Mass    (m)  ----&gt;|                           |                           |---&gt; Inertial Accel (diag.)
+  - Inertia (I)  ----&gt;|                           v                           |---&gt; Angular Accel  (diag.)
+  - dm/dt, dI/dt ----&gt;|   +-----------------------------------------------+   |
+    (variable mass)   |   |         ROTATIONAL DYNAMICS (q, &omega;)         |   |
+                      |   |  I&omega;&#775; = M_b - &omega; x (I&omega;) - I&#775;&omega;  ;  q&#775; = &frac12;&Omega;(&omega;)q  |   |
+                      |   +-----------------------------------------------+   |
+                      |         Central body: Earth / Moon / Mars / ...        |
+                      +-------------------------------------------------------+</code></pre>
+								<p>The block simultaneously advances the translational state (<span class="vec">r</span>, <span class="vec">v</span>) and the rotational state (<span class="vec">q</span>, <span class="vec">&omega;</span>) using a numerical ODE solver, with an optional variable-mass model coupling the two.</p>
+
+								<hr>
+
+								<h2>3. Reference Frames</h2>
+								<p>Correctly interpreting the inputs and outputs requires knowing which coordinate system each quantity lives in. The block works across several standard frames:</p>
+								<div class="table-wrapper">
+								<table>
+									<thead>
+										<tr><th>Frame</th><th>Abbrev.</th><th>Description</th></tr>
+									</thead>
+									<tbody>
+										<tr><td><strong>Inertial Celestial Reference</strong></td><td>ICRF</td><td>Quasi-inertial frame used for integration of the equations of motion (position, velocity, attitude reference).</td></tr>
+										<tr><td><strong>Planet Fixed-Frame</strong></td><td>ITRF / ME</td><td>Rotates with the central body (ITRF for Earth, Mean-Earth/ME for the Moon). Used for ground-relative outputs.</td></tr>
+										<tr><td><strong>Body Frame</strong></td><td>Body</td><td>Attached to the spacecraft; body forces <span class="vec">F</span><sub>b</sub>, moments <span class="vec">M</span><sub>b</sub>, and the inertia tensor <span class="vec">I</span> are expressed here.</td></tr>
+										<tr><td><strong>Local-Vertical Local-Horizontal</strong></td><td>LVLH</td><td>Orbit-relative frame (radial / along-track / cross-track), useful for relative motion and attitude reference.</td></tr>
+										<tr><td><strong>North-East-Down</strong></td><td>NED</td><td>Local geographic frame for attitude relative to the planet surface.</td></tr>
+									</tbody>
+								</table>
+								</div>
+								<p>Transformation from the body frame to the inertial frame is performed with the attitude quaternion: <span class="vec">a</span><sub>icrf</sub> = quatrotate(<span class="vec">q</span><sub>b&rarr;icrf</sub>, <span class="vec">a</span><sub>b</sub>).</p>
+
+								<hr>
+
+								<h2>4. Inputs, Outputs &amp; States</h2>
+
+								<h3>4.1 Input Ports</h3>
+								<div class="table-wrapper">
+								<table>
+									<thead>
+										<tr><th>Signal</th><th>Symbol</th><th>Frame</th><th>Description</th></tr>
+									</thead>
+									<tbody>
+										<tr><td><strong>Body Force</strong></td><td><span class="vec">F</span><sub>b</sub></td><td>Body</td><td>Net applied force (e.g., thrust) in body-fixed coordinates.</td></tr>
+										<tr><td><strong>Body Moment</strong></td><td><span class="vec">M</span><sub>b</sub></td><td>Body</td><td>Net applied torque about the body axes (reaction wheels, thrusters, control torques).</td></tr>
+										<tr><td><strong>External Acceleration</strong></td><td><span class="vec">a</span><sub>e</sub></td><td>ICRF / fixed</td><td>Optional perturbing accelerations (drag, third-body, SRP) supplied externally.</td></tr>
+										<tr><td><strong>Mass / Inertia</strong></td><td><span class="mv">m</span>, <span class="vec">I</span></td><td>Body</td><td>Current mass and inertia tensor (variable-mass modes).</td></tr>
+										<tr><td><strong>Mass Rates</strong></td><td><span class="mv">m&#775;</span>, <span class="vec">I&#775;</span></td><td>Body</td><td>Rate of change of mass / inertia for custom variable-mass modeling.</td></tr>
+									</tbody>
+								</table>
+								</div>
+
+								<h3>4.2 Output Ports</h3>
+								<ol>
+									<li><strong>Position</strong> (<span class="vec">r</span>): in ICRF or fixed-frame (m).</li>
+									<li><strong>Velocity</strong> (<span class="vec">v</span>): in ICRF or fixed-frame (m/s).</li>
+									<li><strong>Attitude</strong>: quaternion <span class="vec">q</span> (scalar-first), direction cosine matrix (DCM), or Euler angles &mdash; referenced to ICRF, fixed-frame, NED, or LVLH.</li>
+									<li><strong>Angular Velocity</strong> (<span class="vec">&omega;</span>): body rates (rad/s).</li>
+									<li><strong>Inertial Acceleration</strong> (diagnostic): total acceleration including gravity (m/s<sup>2</sup>).</li>
+									<li><strong>Angular Acceleration</strong> (diagnostic): total angular acceleration (rad/s<sup>2</sup>).</li>
+								</ol>
+
+								<hr>
+
+								<h2>5. Translational Dynamics</h2>
+								<p>The inertial acceleration of the spacecraft is the sum of the body force mapped into the inertial frame plus all environmental accelerations:</p>
+								<p class="eq"><span class="vec">a</span><sub>icrf</sub> = body2inertial<span class="frac"><span>(<span class="vec">F</span><sub>b</sub></span><span class="den"><span class="mv">m</span>)</span></span> + <span class="vec">a</span><sub>applied</sub> + <span class="vec">a</span><sub>gravity</sub> + <span class="vec">a</span><sub>3rd</sub> + <span class="vec">a</span><sub>drag</sub> + <span class="vec">a</span><sub>srp</sub></p>
+								<p>Velocity and position follow by numerical integration: <span class="vec">r&#775;</span> = <span class="vec">v</span> and <span class="vec">v&#775;</span> = <span class="vec">a</span><sub>icrf</sub>.</p>
+
+								<h3>5.1 Gravity Models</h3>
+								<ul>
+									<li><strong>Point-mass:</strong> <span class="vec">a</span><sub>gravity</sub> = &minus;<span class="frac"><span>&mu; <span class="vec">r</span><sub>icrf</sub></span><span class="den">|<span class="vec">r</span><sub>icrf</sub>|<sup>3</sup></span></span>, where <span class="mv">&mu;</span> is the central-body gravitational parameter.</li>
+									<li><strong>Oblate ellipsoid (<span class="mv">J</span><sub>2</sub>):</strong> adds the second-degree zonal harmonic, capturing the dominant effect of planetary flattening (orbital plane and perigee precession).</li>
+									<li><strong>Spherical harmonics:</strong> higher-order gravity field (up to degree/order 360 for Earth EGM2008) for high-fidelity orbit propagation.</li>
+								</ul>
+
+								<h3>5.2 Perturbation Accelerations</h3>
+								<p><strong>Atmospheric drag:</strong></p>
+								<p class="eq"><span class="vec">a</span><sub>drag</sub> = &minus;<span class="frac"><span>1</span><span class="den">2</span></span> &rho; <span class="frac"><span><span class="mv">C</span><sub>D</sub> <span class="mv">A</span></span><span class="den"><span class="mv">m</span></span></span> |<span class="vec">v</span><sub>rel</sub>| <span class="vec">v</span><sub>rel</sub></p>
+								<p><strong>Third-body gravity</strong> (e.g., Sun and Moon on an Earth orbit):</p>
+								<p class="eq"><span class="vec">a</span><sub>3rd</sub> = &mu;<sub>3</sub> ( <span class="frac"><span><span class="vec">r</span><sub>sat,3</sub></span><span class="den">|<span class="vec">r</span><sub>sat,3</sub>|<sup>3</sup></span></span> &minus; <span class="frac"><span><span class="vec">r</span><sub>3</sub></span><span class="den">|<span class="vec">r</span><sub>3</sub>|<sup>3</sup></span></span> )</p>
+								<p><strong>Solar radiation pressure (SRP):</strong></p>
+								<p class="eq"><span class="vec">a</span><sub>srp</sub> = &minus;&nu; <span class="mv">C</span><sub>r</sub> <span class="frac"><span><span class="mv">A</span><sub>s</sub></span><span class="den"><span class="mv">m</span></span></span> <span class="mv">p</span><sub>srp</sub> ( <span class="frac"><span>AU</span><span class="den"><span class="mv">r</span><sub>sun</sub></span></span> )<sup>2</sup> <span class="vec">r&#770;</span><sub>sat,sun</sub></p>
+								<p>where <span class="mv">&nu;</span> is the shadow (eclipse) factor and <span class="mv">C</span><sub>r</sub> the reflectivity coefficient.</p>
+
+								<hr>
+
+								<h2>6. Rotational Dynamics</h2>
+								<p>The attitude of the rigid body evolves under Euler's rotational equation. Solving for the angular acceleration:</p>
+								<p class="eq"><span class="vec">&omega;&#775;</span> = <span class="vec">I</span><sup>&minus;1</sup>[ <span class="vec">M</span><sub>b</sub> &minus; <span class="vec">&omega;</span> &times; (<span class="vec">I</span> <span class="vec">&omega;</span>) &minus; <span class="vec">I&#775;</span> <span class="vec">&omega;</span> ]</p>
+								<p>The gyroscopic term <span class="vec">&omega;</span> &times; (<span class="vec">I</span> <span class="vec">&omega;</span>) couples the three body axes, while <span class="vec">I&#775;</span> <span class="vec">&omega;</span> accounts for a changing inertia tensor under variable mass.</p>
+								<p>Attitude is propagated as a <strong>quaternion</strong> to avoid gimbal-lock singularities. The quaternion kinematic equation is:</p>
+								<div class="eq"><span class="vec">q&#775;</span> = <span class="frac"><span>1</span><span class="den">2</span></span> <span class="vec">&Omega;</span>(<span class="vec">&omega;</span>) <span class="vec">q</span>,&nbsp;&nbsp;&nbsp; <span class="vec">&Omega;</span>(<span class="vec">&omega;</span>) =
+								<table class="mtx">
+									<tr><td>0</td><td>&minus;&omega;<sub>x</sub></td><td>&minus;&omega;<sub>y</sub></td><td>&minus;&omega;<sub>z</sub></td></tr>
+									<tr><td>&omega;<sub>x</sub></td><td>0</td><td>&omega;<sub>z</sub></td><td>&minus;&omega;<sub>y</sub></td></tr>
+									<tr><td>&omega;<sub>y</sub></td><td>&minus;&omega;<sub>z</sub></td><td>0</td><td>&omega;<sub>x</sub></td></tr>
+									<tr><td>&omega;<sub>z</sub></td><td>&omega;<sub>y</sub></td><td>&minus;&omega;<sub>x</sub></td><td>0</td></tr>
+								</table></div>
+								<p>The output attitude can be delivered as this quaternion, an equivalent 3&times;3 DCM, or an Euler-angle sequence (ZYX, ZXZ, etc.).</p>
+
+								<hr>
+
+								<h2>7. Mass Properties</h2>
+								<p>The block supports three mass-modeling fidelities, which is critical for maneuvers that burn propellant:</p>
+								<div class="table-wrapper">
+								<table>
+									<thead>
+										<tr><th>Mode</th><th>What You Provide</th><th>Behavior</th></tr>
+									</thead>
+									<tbody>
+										<tr><td><strong>Fixed Mass</strong></td><td><span class="mv">m</span>, <span class="vec">I</span> (constant)</td><td><span class="mv">m&#775;</span> = 0, <span class="vec">I&#775;</span> = 0 for the whole run.</td></tr>
+										<tr><td><strong>Simple Variable Mass</strong></td><td><span class="mv">m&#775;</span> input, empty/full config</td><td>Mass integrates from <span class="mv">m&#775;</span>; inertia interpolates linearly (below).</td></tr>
+										<tr><td><strong>Custom Variable Mass</strong></td><td><span class="mv">m</span>, <span class="mv">m&#775;</span>, <span class="vec">I</span>, <span class="vec">I&#775;</span></td><td>Full user control of the mass/inertia time history.</td></tr>
+									</tbody>
+								</table>
+								</div>
+								<p>For the simple variable-mass mode, the inertia tensor is interpolated between the empty and full configurations as a function of current mass:</p>
+								<p class="eq"><span class="vec">I</span> = <span class="frac"><span><span class="vec">I</span><sub>full</sub> &minus; <span class="vec">I</span><sub>empty</sub></span><span class="den"><span class="mv">m</span><sub>full</sub> &minus; <span class="mv">m</span><sub>empty</sub></span></span> (<span class="mv">m</span> &minus; <span class="mv">m</span><sub>empty</sub>) + <span class="vec">I</span><sub>empty</sub></p>
+
+								<hr>
+
+								<h2>8. Central Body &amp; Initial Conditions</h2>
+								<p>The <strong>central body</strong> is selectable &mdash; Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune, or a custom body &mdash; which sets <span class="mv">&mu;</span>, the fixed-frame definition, and the reference ellipsoid. For Earth, optional <strong>Earth Orientation Parameter (EOP)</strong> data refines the ICRF&nbsp;&harr;&nbsp;ITRF transformation.</p>
+								<p>Initial conditions can be specified in several equivalent formats:</p>
+								<ul>
+									<li><strong>Keplerian elements:</strong> semi-major axis <span class="mv">a</span>, eccentricity <span class="mv">e</span>, inclination <span class="mv">i</span>, RAAN <span class="mv">&Omega;</span>, argument of periapsis <span class="mv">&omega;</span>, true anomaly <span class="mv">&nu;</span>.</li>
+									<li><strong>Modified Keplerian:</strong> special-case handling for circular, equatorial, or circular-equatorial orbits.</li>
+									<li><strong>State vectors:</strong> position and velocity directly, in ICRF or fixed-frame.</li>
+								</ul>
+
+								<hr>
+
+								<h2>9. Constellation Modeling</h2>
+								<p>A single block can propagate <strong>multiple spacecraft simultaneously</strong>. Parameter arrays expand automatically across the constellation, while a single scalar value broadcasts to all vehicles. (Exception: Moon libration angles and spin-axis orientation remain global and are not expanded per vehicle.) This makes the block well-suited to formation-flying and mega-constellation studies without duplicating the model.</p>
+
+								<hr>
+
+								<h2>10. Numerical Integration Notes</h2>
+								<blockquote>
+									<p>For the most accurate orbit and attitude propagation, use a <strong>variable-step solver</strong> with a tight relative tolerance (below 1&times;10<sup>&minus;8</sup>). Looser tolerances run faster but accumulate error over many orbits.</p>
+								</blockquote>
+								<p>Because orbital periods span minutes to hours while attitude dynamics can be much faster, a variable-step solver adapts the step size to resolve both scales efficiently.</p>
+
+								<hr>
+
+								<h2>11. Plant Model Summary</h2>
+								<div class="table-wrapper">
+								<table>
+									<thead>
+										<tr><th>Characteristic</th><th>Spacecraft Dynamics Plant Model</th></tr>
+									</thead>
+									<tbody>
+										<tr><td><strong>Fidelity</strong></td><td>Full 6-DoF rigid body (coupled translation + rotation)</td></tr>
+										<tr><td><strong>States</strong></td><td>Position <span class="vec">r</span>, velocity <span class="vec">v</span>, attitude <span class="vec">q</span>, angular velocity <span class="vec">&omega;</span></td></tr>
+										<tr><td><strong>Inputs</strong></td><td>Body force <span class="vec">F</span><sub>b</sub>, body moment <span class="vec">M</span><sub>b</sub>, external accelerations, mass properties</td></tr>
+										<tr><td><strong>Environment</strong></td><td>Point-mass / <span class="mv">J</span><sub>2</sub> / spherical-harmonic gravity, drag, third-body, SRP</td></tr>
+										<tr><td><strong>Attitude Output</strong></td><td>Quaternion, DCM, or Euler angles (ICRF / fixed / NED / LVLH)</td></tr>
+										<tr><td><strong>Primary Use Case</strong></td><td>Orbit propagation, attitude dynamics, GNC plant, constellation simulation</td></tr>
+									</tbody>
+								</table>
+								</div>
+								<p>In short, the spacecraft plant model is the high-fidelity dynamical &ldquo;truth&rdquo; that a spacecraft GNC design is built and tested against &mdash; the orbital-scale counterpart to the reduced-order fixed-wing UAV guidance model.</p>
+
+							</div>
+
+							<ul class="actions special">
+								<li><a href="./spacecraft_resource.html" class="button large">&larr; Back to Spacecraft Plant model Updates</a></li>
+							</ul>
+						</article>
+
+				</div>
+
+			<!-- Footer -->
+				<footer id="footer">
+					<section class="split contact">
+						<section>
+							<h3>Project</h3>
+							<p>Spacecraft Dynamics 6-DoF Plant Model</p>
+						</section>
+						<section>
+							<h3>Built With</h3>
+							<p>MATLAB, Simulink &amp; Aerospace Blockset</p>
+						</section>
+					</section>
+				</footer>
+
+			<!-- Copyright -->
+				<div id="copyright">
+					<ul><li>&copy; Sally Law Project. 2026.</li><li>Design: <a href="https://html5up.net/">HTML5 UP</a></li></ul>
+				</div>
+
+		</div>
+
+	<!-- Scripts -->
+		<script src="./jquery.min.js"></script>
+		<script src="./jquery.scrollex.min.js"></script>
+		<script src="./jquery.scrolly.min.js"></script>
+		<script src="./browser.min.js"></script>
+		<script src="./breakpoints.min.js"></script>
+		<script src="./util.js"></script>
+		<script src="./main.js"></script>
+
+</body>
+</html>
